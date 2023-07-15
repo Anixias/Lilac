@@ -78,6 +78,10 @@ public sealed class CombatComponent : IComponent
 	{
 		var advantage = battleState.AttackAdvantage;
 		var baseDie = Roll.Die.D20;
+
+		if (Game.Singleton?.CurrentDifficulty == Game.Difficulty.Easy)
+			advantage++;
+		
 		Roll baseRoll = advantage switch
 		{
 			> 0 => new Roll.KeepHighest((uint)(advantage + 1), 1, baseDie),
