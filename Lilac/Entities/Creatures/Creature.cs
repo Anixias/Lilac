@@ -120,14 +120,15 @@ public abstract class Creature : Entity, IHittable, IBattleMember, IAttacker
         var criticalHit = false;
         var hit = false;
 
-        if (attackRollResult.CriticalState == CombatComponent.CriticalState.CriticalSuccess)
+        switch (attackRollResult.CriticalState)
         {
-            hit = true;
-            criticalHit = true;
-        }
-        else if (attackRollResult.CriticalState == CombatComponent.CriticalState.Normal)
-        {
-            hit = target.CheckHit(attackRollResult.AttackValue);
+            case CombatComponent.CriticalState.CriticalSuccess:
+                hit = true;
+                criticalHit = true;
+                break;
+            case CombatComponent.CriticalState.Normal:
+                hit = target.CheckHit(attackRollResult.AttackValue);
+                break;
         }
 
         if (!hit)
