@@ -283,7 +283,7 @@ public abstract class Roll
 
 		public KeepHighest(uint count, uint keep, Die die)
 		{
-			if (keep < count)
+			if (keep > count)
 				throw new ArgumentOutOfRangeException(nameof(keep));
 			
 			Count = count;
@@ -334,7 +334,7 @@ public abstract class Roll
 
 		public KeepLowest(uint count, uint keep, Die die)
 		{
-			if (keep < count)
+			if (keep > count)
 				throw new ArgumentOutOfRangeException(nameof(keep));
 			
 			Count = count;
