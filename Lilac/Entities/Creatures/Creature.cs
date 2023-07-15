@@ -152,7 +152,10 @@ public abstract class Creature : Entity, IHittable, IBattleMember, IAttacker
             {
                 minimumDamage = Game.Singleton?.CurrentDifficulty switch
                 {
+                    // Armor can completely negate damage
                     Game.Difficulty.Easy   => 0,
+                    
+                    // Armor can negate all but X damage
                     Game.Difficulty.Normal => 1,
                     Game.Difficulty.Hard   => 2,
                     _                      => 1
