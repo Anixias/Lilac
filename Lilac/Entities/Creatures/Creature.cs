@@ -120,14 +120,15 @@ public abstract class Creature : Entity, IHittable, IBattleMember, IAttacker
         var criticalHit = false;
         var hit = false;
 
-        if (attackRollResult.CriticalState == CombatComponent.CriticalState.CriticalSuccess)
+        switch (attackRollResult.CriticalState)
         {
-            hit = true;
-            criticalHit = true;
-        }
-        else if (attackRollResult.CriticalState == CombatComponent.CriticalState.Normal)
-        {
-            hit = target.CheckHit(attackRollResult.AttackValue);
+            case CombatComponent.CriticalState.CriticalSuccess:
+                hit = true;
+                criticalHit = true;
+                break;
+            case CombatComponent.CriticalState.Normal:
+                hit = target.CheckHit(attackRollResult.AttackValue);
+                break;
         }
 
         if (!hit)
@@ -145,7 +146,26 @@ public abstract class Creature : Entity, IHittable, IBattleMember, IAttacker
             return;
 
         if (GetComponent<CombatComponent>() is { } combatComponent)
-            source = combatComponent.ReceiveDamage(source);
+        {
+            var minimumDamage = 1;
+            if (IsUser)
+            {
+                minimumDamage = Game.Singleton?.CurrentDifficulty switch
+                {
+                    // Armor can completely negate damage
+                    Game.Difficulty.Easy   => 0,
+                    
+                    // Armor can negate all but X damage
+                    Game.Difficulty.Normal => 1,
+                    Game.Difficulty.Hard   => 2,
+                    _                      => 1
+                };
+
+                minimumDamage = Math.Min(minimumDamage, source.Damage);
+            }
+            
+            source = combatComponent.ReceiveDamage(source, minimumDamage);
+        }
 
         healthComponent.Health -= source.Damage;
     }

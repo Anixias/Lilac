@@ -78,6 +78,10 @@ public sealed class CombatComponent : IComponent
 	{
 		var advantage = battleState.AttackAdvantage;
 		var baseDie = Roll.Die.D20;
+
+		if (Game.Singleton?.CurrentDifficulty == Game.Difficulty.Easy)
+			advantage++;
+		
 		Roll baseRoll = advantage switch
 		{
 			> 0 => new Roll.KeepHighest((uint)(advantage + 1), 1, baseDie),
@@ -147,10 +151,10 @@ public sealed class CombatComponent : IComponent
 		return CriticalState.Normal;
 	}
 
-	public DamageSource ReceiveDamage(DamageSource source)
+	public DamageSource ReceiveDamage(DamageSource source, int minimum = 1)
 	{
 		var armor = GetArmor(source.Type);
-		var newDamage = System.Math.Max(1, source.Damage - armor);
+		var newDamage = System.Math.Max(minimum, source.Damage - armor);
 		return source with { Damage = newDamage };
 	}
 
