@@ -146,7 +146,23 @@ public abstract class Creature : Entity, IHittable, IBattleMember, IAttacker
             return;
 
         if (GetComponent<CombatComponent>() is { } combatComponent)
-            source = combatComponent.ReceiveDamage(source);
+        {
+            var minimumDamage = 1;
+            if (IsUser)
+            {
+                minimumDamage = Game.Singleton?.CurrentDifficulty switch
+                {
+                    Game.Difficulty.Easy   => 0,
+                    Game.Difficulty.Normal => 1,
+                    Game.Difficulty.Hard   => 2,
+                    _                      => 1
+                };
+
+                minimumDamage = Math.Min(minimumDamage, source.Damage);
+            }
+            
+            source = combatComponent.ReceiveDamage(source, minimumDamage);
+        }
 
         healthComponent.Health -= source.Damage;
     }
