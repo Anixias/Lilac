@@ -76,18 +76,15 @@ public sealed class CombatComponent : IComponent
 
 	public AttackResult RollAttack()
 	{
+		var advantage = battleState.AttackAdvantage;
 		var baseDie = Roll.Die.D20;
-		Roll baseRoll = baseDie;
+		Roll baseRoll = advantage switch
+		{
+			> 0 => new Roll.KeepHighest((uint)(advantage + 1), 1, baseDie),
+			< 0 => new Roll.KeepLowest((uint)-(advantage + 1), 1, baseDie),
+			_   => baseDie
+		};
 
-		if (battleState.AttackAdvantage > 0)
-		{
-			baseRoll = new Roll.KeepHighest((uint)battleState.AttackAdvantage, 1, baseDie);
-		}
-		else if (battleState.AttackAdvantage < 0)
-		{
-			baseRoll = new Roll.KeepLowest((uint)(-battleState.AttackAdvantage), 1, baseDie);
-		}
-		
 		var attackRoll = baseRoll + statsComponent.GetAttribute(battleState.AttackAttribute) / 2 + battleState.HitBonus;
 		var attackRollResult = attackRoll.Execute();
 
