@@ -4,3 +4,6 @@ obj/
 # Jetbrains Rider ignores
 *.DotSettings
 .idea/
+
+# VSCode ignores
+.vscode/
