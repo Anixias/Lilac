@@ -61,22 +61,33 @@ public sealed class StatusComponent : IComponent
 			}
 			
 			effect.OnTurnStarted();
+			
+			if (!statusEffects.Contains(effect))
+				i--;
 		}
 	}
 
 	public void TurnChanged()
 	{
-		foreach (var effect in statusEffects)
+		for (var i = 0; i < statusEffects.Count; i++)
 		{
+			var effect = statusEffects[i];
 			effect.OnTurnChanged();
+			
+			if (!statusEffects.Contains(effect))
+				i--;
 		}
 	}
 
 	public void TurnEnded()
 	{
-		foreach (var effect in statusEffects)
+		for (var i = 0; i < statusEffects.Count; i++)
 		{
+			var effect = statusEffects[i];
 			effect.OnTurnEnded();
+			
+			if (!statusEffects.Contains(effect))
+				i--;
 		}
 	}
 
