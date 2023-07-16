@@ -1,4 +1,5 @@
 using System;
+using Lilac.Rendering;
 
 namespace Lilac.Entities;
 
@@ -26,89 +27,89 @@ public sealed class Bonuses
 
 	public void Display()
 	{
-		var positiveColor = ConsoleColor.DarkGreen;
-		var negativeColor = ConsoleColor.DarkRed;
+		var positiveColor = StandardColor.DarkGreen;
+		var negativeColor = StandardColor.DarkRed;
 		
 		if (Strength != 0)
 		{
-			Console.Write("Strength: ");
-			Console.ForegroundColor = Strength > 0 ? positiveColor : negativeColor;
-			Console.WriteLine(DisplayBonus(Strength));
-			Console.ResetColor();
+			Screen.Write("Strength: ");
+			Screen.ForegroundColor = Strength > 0 ? positiveColor : negativeColor;
+			Screen.WriteLine(DisplayBonus(Strength));
+			Screen.ResetColor();
 		}
 
 		if (Agility != 0)
 		{
-			Console.Write("Agility: ");
-			Console.ForegroundColor = Agility > 0 ? positiveColor : negativeColor;
-			Console.WriteLine(DisplayBonus(Agility));
-			Console.ResetColor();
+			Screen.Write("Agility: ");
+			Screen.ForegroundColor = Agility > 0 ? positiveColor : negativeColor;
+			Screen.WriteLine(DisplayBonus(Agility));
+			Screen.ResetColor();
 		}
 
 		if (Intelligence != 0)
 		{
-			Console.Write("Intelligence: ");
-			Console.ForegroundColor = Intelligence > 0 ? positiveColor : negativeColor;
-			Console.WriteLine(DisplayBonus(Intelligence));
-			Console.ResetColor();
+			Screen.Write("Intelligence: ");
+			Screen.ForegroundColor = Intelligence > 0 ? positiveColor : negativeColor;
+			Screen.WriteLine(DisplayBonus(Intelligence));
+			Screen.ResetColor();
 		}
 
 		if (Constitution != 0)
 		{
-			Console.Write("Constitution: ");
-			Console.ForegroundColor = Constitution > 0 ? positiveColor : negativeColor;
-			Console.WriteLine(DisplayBonus(Constitution));
-			Console.ResetColor();
+			Screen.Write("Constitution: ");
+			Screen.ForegroundColor = Constitution > 0 ? positiveColor : negativeColor;
+			Screen.WriteLine(DisplayBonus(Constitution));
+			Screen.ResetColor();
 		}
 
 		if (Perception != 0)
 		{
-			Console.Write("Perception: ");
-			Console.ForegroundColor = Perception > 0 ? positiveColor : negativeColor;
-			Console.WriteLine(DisplayBonus(Perception));
-			Console.ResetColor();
+			Screen.Write("Perception: ");
+			Screen.ForegroundColor = Perception > 0 ? positiveColor : negativeColor;
+			Screen.WriteLine(DisplayBonus(Perception));
+			Screen.ResetColor();
 		}
 
 		if (Charisma != 0)
 		{
-			Console.Write("Charisma: ");
-			Console.ForegroundColor = Charisma > 0 ? positiveColor : negativeColor;
-			Console.WriteLine(DisplayBonus(Charisma));
-			Console.ResetColor();
+			Screen.Write("Charisma: ");
+			Screen.ForegroundColor = Charisma > 0 ? positiveColor : negativeColor;
+			Screen.WriteLine(DisplayBonus(Charisma));
+			Screen.ResetColor();
 		}
 
 		if (Health != 0)
 		{
-			Console.Write("Health: ");
-			Console.ForegroundColor = Health > 0 ? positiveColor : negativeColor;
-			Console.WriteLine(DisplayBonus(Health));
-			Console.ResetColor();
+			Screen.Write("Health: ");
+			Screen.ForegroundColor = Health > 0 ? positiveColor : negativeColor;
+			Screen.WriteLine(DisplayBonus(Health));
+			Screen.ResetColor();
 		}
 
 		if (Mana != 0)
 		{
-			Console.Write("Mana: ");
-			Console.ForegroundColor = Mana > 0 ? positiveColor : negativeColor;
-			Console.WriteLine(DisplayBonus(Mana));
-			Console.ResetColor();
+			Screen.Write("Mana: ");
+			Screen.ForegroundColor = Mana > 0 ? positiveColor : negativeColor;
+			Screen.WriteLine(DisplayBonus(Mana));
+			Screen.ResetColor();
 		}
 
 		if (Initiative != 0)
 		{
-			Console.Write("Initiative: ");
-			Console.ForegroundColor = Initiative > 0 ? positiveColor : negativeColor;
-			Console.WriteLine(DisplayBonus(Initiative));
-			Console.ResetColor();
+			Screen.Write("Initiative: ");
+			Screen.ForegroundColor = Initiative > 0 ? positiveColor : negativeColor;
+			Screen.WriteLine(DisplayBonus(Initiative));
+			Screen.ResetColor();
 		}
 
 		if (Defense != 0)
 		{
-			Console.Write("Defense: ");
-			Console.ForegroundColor = Defense > 0 ? positiveColor : negativeColor;
-			Console.WriteLine(DisplayBonus(Defense));
-			Console.ResetColor();
+			Screen.Write("Defense: ");
+			Screen.ForegroundColor = Defense > 0 ? positiveColor : negativeColor;
+			Screen.WriteLine(DisplayBonus(Defense));
+			Screen.ResetColor();
 		}
 
-		Console.WriteLine();
+		Screen.WriteLine();
 	}
 }

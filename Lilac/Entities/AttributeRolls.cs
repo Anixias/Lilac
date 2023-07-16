@@ -1,5 +1,6 @@
 using System;
 using Lilac.Dice;
+using Lilac.Rendering;
 
 namespace Lilac.Entities;
 
@@ -82,94 +83,94 @@ public sealed class AttributeRolls
 
 	public void Display()
 	{
-		Console.Write("Strength: ".PadRight(16));
+		Screen.Write("Strength: ".PadRight(16));
 		if (strength is not null)
 		{
-			Console.ForegroundColor = ConsoleColor.DarkBlue;
-			Console.Write(strength);
-			Console.ResetColor();
+			Screen.ForegroundColor = StandardColor.DarkBlue;
+			Screen.Write(strength);
+			Screen.ResetColor();
 		}
 		if (strengthRange is not null)
 		{
-			Console.ForegroundColor = ConsoleColor.DarkGray;
-			Console.Write($" ({strengthRange?.Item1.Value}-{strengthRange?.Item2.Value})");
-			Console.ResetColor();
+			Screen.ForegroundColor = StandardColor.DarkGray;
+			Screen.Write($" ({strengthRange?.Item1.Value}-{strengthRange?.Item2.Value})");
+			Screen.ResetColor();
 		}
-		Console.WriteLine();
+		Screen.WriteLine();
 		
-		Console.Write("Agility: ".PadRight(16));
+		Screen.Write("Agility: ".PadRight(16));
 		if (agility is not null)
 		{
-			Console.ForegroundColor = ConsoleColor.DarkBlue;
-			Console.Write(agility);
-			Console.ResetColor();
+			Screen.ForegroundColor = StandardColor.DarkBlue;
+			Screen.Write(agility);
+			Screen.ResetColor();
 		}
 		if (agilityRange is not null)
 		{
-			Console.ForegroundColor = ConsoleColor.DarkGray;
-			Console.Write($" ({agilityRange?.Item1.Value}-{agilityRange?.Item2.Value})");
-			Console.ResetColor();
+			Screen.ForegroundColor = StandardColor.DarkGray;
+			Screen.Write($" ({agilityRange?.Item1.Value}-{agilityRange?.Item2.Value})");
+			Screen.ResetColor();
 		}
-		Console.WriteLine();
+		Screen.WriteLine();
 		
-		Console.Write("Intelligence: ".PadRight(16));
+		Screen.Write("Intelligence: ".PadRight(16));
 		if (intelligence is not null)
 		{
-			Console.ForegroundColor = ConsoleColor.DarkBlue;
-			Console.Write(intelligence);
-			Console.ResetColor();
+			Screen.ForegroundColor = StandardColor.DarkBlue;
+			Screen.Write(intelligence);
+			Screen.ResetColor();
 		}
 		if (intelligenceRange is not null)
 		{
-			Console.ForegroundColor = ConsoleColor.DarkGray;
-			Console.Write($" ({intelligenceRange?.Item1.Value}-{intelligenceRange?.Item2.Value})");
-			Console.ResetColor();
+			Screen.ForegroundColor = StandardColor.DarkGray;
+			Screen.Write($" ({intelligenceRange?.Item1.Value}-{intelligenceRange?.Item2.Value})");
+			Screen.ResetColor();
 		}
-		Console.WriteLine();
+		Screen.WriteLine();
 		
-		Console.Write("Constitution: ".PadRight(16));
+		Screen.Write("Constitution: ".PadRight(16));
 		if (constitution is not null)
 		{
-			Console.ForegroundColor = ConsoleColor.DarkBlue;
-			Console.Write(constitution);
-			Console.ResetColor();
+			Screen.ForegroundColor = StandardColor.DarkBlue;
+			Screen.Write(constitution);
+			Screen.ResetColor();
 		}
 		if (constitutionRange is not null)
 		{
-			Console.ForegroundColor = ConsoleColor.DarkGray;
-			Console.Write($" ({constitutionRange?.Item1.Value}-{constitutionRange?.Item2.Value})");
-			Console.ResetColor();
+			Screen.ForegroundColor = StandardColor.DarkGray;
+			Screen.Write($" ({constitutionRange?.Item1.Value}-{constitutionRange?.Item2.Value})");
+			Screen.ResetColor();
 		}
-		Console.WriteLine();
+		Screen.WriteLine();
 		
-		Console.Write("Perception: ".PadRight(16));
+		Screen.Write("Perception: ".PadRight(16));
 		if (perception is not null)
 		{
-			Console.ForegroundColor = ConsoleColor.DarkBlue;
-			Console.Write(perception);
-			Console.ResetColor();
+			Screen.ForegroundColor = StandardColor.DarkBlue;
+			Screen.Write(perception);
+			Screen.ResetColor();
 		}
 		if (perceptionRange is not null)
 		{
-			Console.ForegroundColor = ConsoleColor.DarkGray;
-			Console.Write($" ({perceptionRange?.Item1.Value}-{perceptionRange?.Item2.Value})");
-			Console.ResetColor();
+			Screen.ForegroundColor = StandardColor.DarkGray;
+			Screen.Write($" ({perceptionRange?.Item1.Value}-{perceptionRange?.Item2.Value})");
+			Screen.ResetColor();
 		}
-		Console.WriteLine();
+		Screen.WriteLine();
 		
-		Console.Write("Charisma: ".PadRight(16));
+		Screen.Write("Charisma: ".PadRight(16));
 		if (charisma is not null)
 		{
-			Console.ForegroundColor = ConsoleColor.DarkBlue;
-			Console.Write(charisma);
-			Console.ResetColor();
+			Screen.ForegroundColor = StandardColor.DarkBlue;
+			Screen.Write(charisma);
+			Screen.ResetColor();
 		}
 		if (charismaRange is not null)
 		{
-			Console.ForegroundColor = ConsoleColor.DarkGray;
-			Console.Write($" ({charismaRange?.Item1.Value}-{charismaRange?.Item2.Value})");
-			Console.ResetColor();
+			Screen.ForegroundColor = StandardColor.DarkGray;
+			Screen.Write($" ({charismaRange?.Item1.Value}-{charismaRange?.Item2.Value})");
+			Screen.ResetColor();
 		}
-		Console.WriteLine("\n");
+		Screen.WriteLine("\n");
 	}
 }

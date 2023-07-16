@@ -1,4 +1,5 @@
 using System;
+using Lilac.Rendering;
 
 namespace Lilac.Menus;
 
@@ -19,16 +20,16 @@ public sealed class PreIntroMenu : Menu
 	
     public override void RenderTitle()
     {
-        Console.ForegroundColor = ConsoleColor.Blue;
+        Screen.ForegroundColor = StandardColor.Blue;
 
-		Console.Write("# =========== ");
-		Console.ForegroundColor = ConsoleColor.Cyan;
-		Console.Write("Welcome");
-		Console.ForegroundColor = ConsoleColor.Blue;
-		Console.WriteLine(" =========== #");
+		Screen.Write("# =========== ");
+		Screen.ForegroundColor = StandardColor.Cyan;
+		Screen.Write("Welcome");
+		Screen.ForegroundColor = StandardColor.Blue;
+		Screen.WriteLine(" =========== #");
 
-		Console.ResetColor();
+		Screen.ResetColor();
 
-		Console.WriteLine("You may press ESC at any time to view the pause menu.");
+		Screen.WriteLine("You may press ESC at any time to view the pause menu.");
     }
 }

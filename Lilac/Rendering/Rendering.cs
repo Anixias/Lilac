@@ -4,20 +4,20 @@ namespace Lilac.Rendering;
 
 public static class Drawing
 {
-	public static void DrawBar(int width, double percent, ConsoleColor color)
+	public static void DrawBar(int width, double percent, IColor color)
 	{
-		Console.ResetColor();
-		Console.Write("[");
+		Screen.ResetColor();
+		Screen.Write("[");
 		var filled = (int)Math.Ceiling(width * percent);
-		Console.BackgroundColor = color;
+		Screen.BackgroundColor = color;
 		if (filled > 0)
-			Console.Write(new string(' ', filled));
+			Screen.Write(new string(' ', filled));
 		
-		Console.ResetColor();
+		Screen.ResetColor();
 
 		if (width - filled > 0)
-			Console.Write(new string(' ', width - filled));
+			Screen.Write(new string(' ', width - filled));
 		
-		Console.Write("]");
+		Screen.Write("]");
 	}
 }

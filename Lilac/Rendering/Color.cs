@@ -60,12 +60,12 @@ public readonly struct StandardColor : IColor
 	
 	public string PrintForeground()
 	{
-		return $"38;5;{ID}";
+		return $"38;5;{ID};25";
 	}
 	
 	public string PrintBackground()
 	{
-		return $"48;5;{ID}";
+		return $"48;5;{ID};25";
 	}
 
 	public static readonly StandardColor Black = new(0);

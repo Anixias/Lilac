@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Lilac.Rendering;
 
 namespace Lilac.Menus;
 
@@ -57,7 +58,7 @@ public abstract class Prompt : IMenu
 
     public virtual void RenderOptions()
     {
-        Console.WriteLine("> " + Input + "|");
+        Screen.WriteLine("> " + Input + "|");
     }
 
     public virtual bool HandleKey(ConsoleKeyInfo key)

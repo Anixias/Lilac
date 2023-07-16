@@ -1,4 +1,5 @@
 using System;
+using Lilac.Rendering;
 
 namespace Lilac.Menus;
 
@@ -29,13 +30,13 @@ public sealed class PauseMenu : Menu
 	
     public override void RenderTitle()
     {
-        Console.ForegroundColor = ConsoleColor.DarkGray;
+        Screen.ForegroundColor = StandardColor.DarkGray;
 
-		Console.Write("# =========== ");
-		Console.ForegroundColor = ConsoleColor.Yellow;
-		Console.Write("Paused");
-		Console.ForegroundColor = ConsoleColor.DarkGray;
-		Console.WriteLine(" =========== #");
+		Screen.Write("# =========== ");
+		Screen.ForegroundColor = StandardColor.Yellow;
+		Screen.Write("Paused");
+		Screen.ForegroundColor = StandardColor.DarkGray;
+		Screen.WriteLine(" =========== #");
 
 		Console.ResetColor();
     }
