@@ -36,6 +36,11 @@ public abstract class StatusEffect
 
 	/// <summary>Called at the start of the any creature's turn, including the affected creature.</summary>
 	public virtual void OnTurnChanged() {}
+	
+	/// <summary>
+	/// Called after the affected creature has attempted an attack.
+	/// </summary>
+	public virtual void OnAttacked() {}
 
 	/// <summary>Called when the effect is first inflicted.</summary>
 	public virtual void OnInflicted() {}
@@ -52,10 +57,11 @@ public abstract class StatusEffect
 		}
 		
 		public sealed override int Duration => 0;
-	
+
 		public sealed override void OnTurnStarted() {}
 		public sealed override void OnTurnEnded() {}
 		public sealed override void OnTurnChanged() {}
+		public sealed override void OnAttacked() {}
 		public sealed override void OnExpired() {}
 	}
 
@@ -86,6 +92,44 @@ public abstract class StatusEffect
 		{
 			if (Entity.GetComponent<CombatComponent>() is { } combatComponent)
 				combatComponent.battleState.DefenseAdvantage -= 1;
+		}
+	}
+	
+	public sealed class Prepared : StatusEffect
+	{
+		public Prepared(Entity entity)
+			: base(entity)
+		{
+			
+		}
+
+		public override StatusEffectAlignment Alignment => StatusEffectAlignment.Positive;
+		public override string DisplayIcon => "(Pr)";
+		public override string DisplayName => "Prepared";
+
+		public override string Description => "The affected creature is focusing on preparing an attack, gaining +1 " +
+											  "Advantage to its next attack for 1 turn.";
+
+		public override int Duration => 2;
+
+		public override void OnInflicted()
+		{
+			if (Entity.GetComponent<CombatComponent>() is { } combatComponent)
+				combatComponent.battleState.AttackAdvantage += 1;
+		}
+
+		public override void OnAttacked()
+		{
+			OnExpired();
+
+			if (Entity.GetComponent<StatusComponent>() is { } statusComponent)
+				statusComponent.Remove(this);
+		}
+
+		public override void OnExpired()
+		{
+			if (Entity.GetComponent<CombatComponent>() is { } combatComponent)
+				combatComponent.battleState.AttackAdvantage -= 1;
 		}
 	}
 

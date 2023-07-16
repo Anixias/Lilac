@@ -79,6 +79,14 @@ public sealed class StatusComponent : IComponent
 		}
 	}
 
+	public void Attacked()
+	{
+		foreach (var effect in statusEffects)
+		{
+			effect.OnAttacked();
+		}
+	}
+
 	public void Render()
 	{
 		foreach (var effect in statusEffects)

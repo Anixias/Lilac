@@ -396,8 +396,19 @@ public sealed class GameMenu : MenuContainer
 								currentBattleMember.EndTurn();
 							}
 						},
-						new Option("Hide"),
-						new Option("Prepare"),
+						new Option("Prepare")
+						{
+							selected = () =>
+							{
+								if (currentBattleMember is Entity entity)
+								{
+									var preparedEffect = new StatusEffect.Prepared(entity);
+									entity.GetComponent<StatusComponent>()?.Inflict(preparedEffect);
+								}
+								
+								currentBattleMember.EndTurn();
+							}
+						},
 						new Option("Use"),
 						new Option("Cast"),
 						new Option("Skip")

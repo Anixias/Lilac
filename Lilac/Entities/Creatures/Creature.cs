@@ -115,6 +115,13 @@ public abstract class Creature : Entity, IHittable, IBattleMember, IAttacker
     /// <returns><see langword="true"/> if the attack hits the target; <see langword="false"/> otherwise.</returns>
     public bool Attack(IHittable target)
     {
+        var attackResult = PerformAttack(target);
+        GetComponent<StatusComponent>()?.Attacked();
+        return attackResult;
+    }
+
+    private bool PerformAttack(IHittable target)
+    {
         if (GetComponent<CombatComponent>() is not { } combatComponent)
             return false;
 
