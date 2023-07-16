@@ -15,6 +15,7 @@ public sealed class StatusComponent : IComponent
 	/// <param name="effect">The effect to inflict.</param>
 	public void Inflict(StatusEffect effect)
 	{
+		effect.TurnsLeft = effect.Duration;
 		statusEffects.Add(effect);
 		effect.OnInflicted();
 	}
