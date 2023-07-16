@@ -83,7 +83,7 @@ public sealed class CharacterCreationMenu : MenuContainer
 
         public override void RenderTitle()
         {
-            Console.WriteLine("What is your name?");
+            Screen.WriteLine("What is your name?");
         }
     }
 
@@ -179,10 +179,10 @@ public sealed class CharacterCreationMenu : MenuContainer
 
         public override void RenderTitle()
         {
-            Console.WriteLine("Select a class for your character:\n");
-            Console.ForegroundColor = ConsoleColor.DarkGray;
-            Console.WriteLine(selectedClass.Description + "\n");
-            Console.ResetColor();
+            Screen.WriteLine("Select a class for your character:\n");
+            Screen.ForegroundColor = StandardColor.DarkGray;
+            Screen.WriteLine(selectedClass.Description + "\n");
+            Screen.ResetColor();
 
 			selectedClass.Bonuses?.Display();
         }
@@ -227,10 +227,10 @@ public sealed class CharacterCreationMenu : MenuContainer
 
         public override void RenderTitle()
         {
-            Console.WriteLine("Select a race for your character:\n");
-            Console.ForegroundColor = ConsoleColor.DarkGray;
-            Console.WriteLine(selectedRace.Description + "\n");
-            Console.ResetColor();
+            Screen.WriteLine("Select a race for your character:\n");
+            Screen.ForegroundColor = StandardColor.DarkGray;
+            Screen.WriteLine(selectedRace.Description + "\n");
+            Screen.ResetColor();
 
 			selectedRace.Bonuses?.Display();
 			selectedRace.AttributeRolls?.Display();

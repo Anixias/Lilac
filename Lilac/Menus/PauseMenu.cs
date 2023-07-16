@@ -38,6 +38,6 @@ public sealed class PauseMenu : Menu
 		Screen.ForegroundColor = StandardColor.DarkGray;
 		Screen.WriteLine(" =========== #");
 
-		Console.ResetColor();
+		Screen.ResetColor();
     }
 }
