@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using Lilac.Combat;
 using Lilac.Entities;
 using Lilac.Rendering;
 
@@ -30,7 +32,14 @@ public sealed class CharacterCreationMenu : MenuContainer
                     playerRaceMenu.OnRaceSelected += race =>
                     {
                         character.Race = race;
-                        OnCharacterFinished?.Invoke();
+
+                        var magicQuizMenu = new MagicQuizMenu(character);
+                        magicQuizMenu.OnQuizComplete += () =>
+                        {
+                            OnCharacterFinished?.Invoke();
+                        };
+
+                        currentMenu = magicQuizMenu;
                     };
 
                     playerRaceMenu.OnBackSelected += () =>
@@ -237,6 +246,247 @@ public sealed class CharacterCreationMenu : MenuContainer
 
 			selectedRace.Bonuses?.Display();
 			selectedRace.AttributeRolls?.Display();
+        }
+    }
+
+    private sealed class MagicQuizMenu : Menu
+    {
+        public event EventHandler? OnQuizComplete;
+
+        private sealed class Question
+        {
+            public string Prompt { get; init; } = "";
+            public Option[] Options { get; init; } = Array.Empty<Option>();
+        }
+        
+        private int energyScore;
+        private int synthesisScore;
+        private int spiritScore;
+        private int clockwiseScore;
+        private int counterClockwiseScore;
+        private int questionIndex;
+        private readonly Question[] questions;
+        private readonly Character character;
+
+        public MagicQuizMenu(Character character)
+        {
+            this.character = character;
+            
+            questions = new[]
+            {
+                new Question
+                {
+                    Prompt = "When facing a difficult decision, you generally rely more on your...",
+                    Options = new[]
+                    {
+                        new Option("Intuition and gut feeling")
+                        {
+                            selected = () =>
+                            {
+                                energyScore++;
+                                Advance();
+                            }
+                        },
+                        new Option("Analytical skills and logic")
+                        {
+                            selected = () =>
+                            {
+                                synthesisScore++;
+                                Advance();
+                            }
+                        },
+                        new Option("Empathy and understanding of others")
+                        {
+                            selected = () =>
+                            {
+                                spiritScore++;
+                                Advance();
+                            }
+                        }
+                    }
+                },
+                new Question
+                {
+                    Prompt = "How do you prefer to interact with the world around you?",
+                    Options = new[]
+                    {
+                        new Option("Actively, often initiating actions and making changes")
+                        {
+                            selected = () =>
+                            {
+                                energyScore++;
+                                Advance();
+                            }
+                        },
+                        new Option("Observantly, learning about and appreciating what's there")
+                        {
+                            selected = () =>
+                            {
+                                synthesisScore++;
+                                Advance();
+                            }
+                        },
+                        new Option("Harmoniously, always seeking balance and connection")
+                        {
+                            selected = () =>
+                            {
+                                spiritScore++;
+                                Advance();
+                            }
+                        }
+                    }
+                },
+                new Question
+                {
+                    Prompt = "What inspires you the most?",
+                    Options = new[]
+                    {
+                        new Option("Action and adventure")
+                        {
+                            selected = () =>
+                            {
+                                energyScore++;
+                                Advance();
+                            }
+                        },
+                        new Option("Discovery and creation")
+                        {
+                            selected = () =>
+                            {
+                                synthesisScore++;
+                                Advance();
+                            }
+                        },
+                        new Option("Harmony and understanding")
+                        {
+                            selected = () =>
+                            {
+                                spiritScore++;
+                                Advance();
+                            }
+                        }
+                    }
+                },
+                new Question
+                {
+                    Prompt = "When given a new project or task, you typically...",
+                    Options = new[]
+                    {
+                        new Option("Dive right in and figure things out as you go")
+                        {
+                            selected = () =>
+                            {
+                                clockwiseScore++;
+                                Advance();
+                            }
+                        },
+                        new Option("Take time to plan and organize before getting started")
+                        {
+                            selected = () =>
+                            {
+                                counterClockwiseScore++;
+                                Advance();
+                            }
+                        }
+                    }
+                },
+                new Question
+                {
+                    Prompt = "When learning something new, you prefer to...",
+                    Options = new[]
+                    {
+                        new Option("Learn by doing, embracing trial and error")
+                        {
+                            selected = () =>
+                            {
+                                clockwiseScore++;
+                                Advance();
+                            }
+                        },
+                        new Option("Learn by researching and understanding the underlying theory")
+                        {
+                            selected = () =>
+                            {
+                                counterClockwiseScore++;
+                                Advance();
+                            }
+                        }
+                    }
+                },
+                new Question
+                {
+                    Prompt = "When you face a problem, you tend to...",
+                    Options = new[]
+                    {
+                        new Option("Quickly make a decision and follow through")
+                        {
+                            selected = () =>
+                            {
+                                clockwiseScore++;
+                                Advance();
+                            }
+                        },
+                        new Option("Carefully consider all your options before deciding")
+                        {
+                            selected = () =>
+                            {
+                                counterClockwiseScore++;
+                                Advance();
+                            }
+                        }
+                    }
+                },
+            };
+
+            Start();
+        }
+        
+        public override void RenderTitle()
+        {
+            if (questionIndex >= questions.Length)
+                return;
+
+            var question = questions[questionIndex];
+            Screen.WriteLine(question.Prompt);
+        }
+
+        private void Start()
+        {
+            if (questionIndex >= questions.Length)
+            {
+                FinishQuiz();
+            }
+            else
+            {
+                var question = questions[questionIndex];
+                Options = question.Options;
+            }
+        }
+
+        private void Advance()
+        {
+            questionIndex++;
+            if (questionIndex >= questions.Length)
+            {
+                FinishQuiz();
+            }
+            else
+            {
+                var question = questions[questionIndex];
+                Options = question.Options;
+            }
+        }
+
+        private void FinishQuiz()
+        {
+            const int offset = 3;
+            character.Affinities.Add(DamageType.Fire, energyScore + clockwiseScore - offset);
+            character.Affinities.Add(DamageType.Electricity, energyScore + counterClockwiseScore - offset);
+            character.Affinities.Add(DamageType.Water, synthesisScore + clockwiseScore - offset);
+            character.Affinities.Add(DamageType.Earth, synthesisScore + counterClockwiseScore - offset);
+            character.Affinities.Add(DamageType.Shadow, spiritScore + clockwiseScore - offset);
+            character.Affinities.Add(DamageType.Air, spiritScore + counterClockwiseScore - offset);
+            OnQuizComplete?.Invoke();
         }
     }
 }

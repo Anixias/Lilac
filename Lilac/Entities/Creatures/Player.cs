@@ -19,6 +19,7 @@ public sealed class Player : Creature
 		if (GetComponent<CombatComponent>() is not { } combatComponent)
 			return;
 
+		combatComponent.Affinities = character.Affinities;
 		combatComponent.battleState.AttackAttribute = StatsComponent.Attribute.Strength;
 		combatComponent.battleState.DamageType = DamageType.Slashing;
 		combatComponent.battleState.DamageRoll = Roll.Die.D6;

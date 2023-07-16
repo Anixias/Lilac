@@ -1,4 +1,5 @@
-using System;
+using System.Collections.Generic;
+using Lilac.Combat;
 using Lilac.Rendering;
 
 namespace Lilac.Entities;
@@ -9,6 +10,7 @@ public sealed class Character
     public IColor Color { get; set; } = StandardColor.Red;
     public Class Class { get; set; } = Class.Warrior;
     public Race Race { get; set; } = Race.Human;
+	public Dictionary<DamageType.Magical, int> Affinities { get; } = new();
 
 	public void Display()
 	{

@@ -28,6 +28,11 @@ public sealed class CombatComponent : IComponent
 	/// <summary>The resistance bonuses to specific magical damage types.</summary>
 	public Dictionary<DamageType.Magical, int> Resistances { get; } = new();
 
+	/// <summary>
+	/// The affinity levels for specific magical damage types.
+	/// </summary>
+	public Dictionary<DamageType.Magical, int> Affinities { get; set; } = new();
+
 	/// <summary>Returns the final defense for the given <see cref="DamageType.Physical"/>.</summary>
 	public int GetDefense(DamageType.Physical damageType)
 	{
@@ -43,7 +48,12 @@ public sealed class CombatComponent : IComponent
 	/// <summary>Returns the final resistance for the given <see cref="DamageType.Magical"/>.</summary>
 	public int GetResistance(DamageType.Magical damageType)
 	{
-		return Resistance + (Resistances.TryGetValue(damageType, out var resistance) ? resistance : 0);
+		var affinityBonus = 0;
+
+		if (Affinities.TryGetValue(damageType, out var affinity) && affinity > 0)
+			affinityBonus += affinity * 2;
+		
+		return affinityBonus + Resistance + (Resistances.TryGetValue(damageType, out var resistance) ? resistance : 0);
 	}
 
 	/// <summary>Returns the final defense/resistance for the given <see cref="DamageType"/>.</summary>
@@ -75,7 +85,7 @@ public sealed class CombatComponent : IComponent
 	}
 	public int Evasion => 10 + statsComponent.Agility / 2;
 
-	public AttackResult RollAttack()
+	public AttackResult RollAttack(CombatComponent? target)
 	{
 		var advantage = battleState.AttackAdvantage;
 		var baseDie = Roll.Die.D20;
@@ -96,8 +106,19 @@ public sealed class CombatComponent : IComponent
 		var attackRollResult = attackRoll.Execute();
 
 		var criticalState = CriticalState.Normal;
+		var criticalChanceBonus = battleState.CriticalChanceBonus;
+
+		if (battleState.DamageType is DamageType.Magical damageType)
+		{
+			if (Affinities.TryGetValue(damageType, out var affinity) && affinity > 0)
+				criticalChanceBonus += affinity;
+
+			if (target is not null && target.Affinities.TryGetValue(damageType, out var targetAffinity) && targetAffinity < 0)
+				criticalChanceBonus -= targetAffinity;
+		}
+
 		if (attackRollResult is DieRollResult dieRollResult)
-			criticalState = GetCriticalState(dieRollResult.RollValue, battleState.CriticalChanceBonus);
+			criticalState = GetCriticalState(dieRollResult.RollValue, criticalChanceBonus);
 
 		return new AttackResult(attackRollResult.Value, criticalState);
 	}
@@ -141,7 +162,7 @@ public sealed class CombatComponent : IComponent
 		return damage;
 	}
 
-	private CriticalState GetCriticalState(int rollValue, int criticalChanceBonus = 0)
+	private static CriticalState GetCriticalState(int rollValue, int criticalChanceBonus = 0)
 	{
 		var criticalThreshold = 20 - criticalChanceBonus;
 		if (rollValue >= criticalThreshold)
@@ -156,7 +177,7 @@ public sealed class CombatComponent : IComponent
 	public DamageSource ReceiveDamage(DamageSource source, int minimum = 1)
 	{
 		var armor = GetArmor(source.Type);
-		var newDamage = System.Math.Max(minimum, source.Damage - armor);
+		var newDamage = Math.Max(minimum, source.Damage - armor);
 		return source with { Damage = newDamage };
 	}
 
