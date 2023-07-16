@@ -31,7 +31,7 @@ public sealed class CombatComponent : IComponent
 	/// <summary>
 	/// The affinity levels for specific magical damage types.
 	/// </summary>
-	public Dictionary<DamageType.Magical, int> Affinities { get; } = new();
+	public Dictionary<DamageType.Magical, int> Affinities { get; set; } = new();
 
 	/// <summary>Returns the final defense for the given <see cref="DamageType.Physical"/>.</summary>
 	public int GetDefense(DamageType.Physical damageType)
