@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Lilac.Dice;
 using Lilac.Combat;
@@ -82,10 +83,12 @@ public sealed class CombatComponent : IComponent
 		if (Game.Singleton?.CurrentDifficulty == Game.Difficulty.Easy)
 			advantage++;
 		
+		var rollCount = (uint)(Math.Abs(advantage) + 1);
+		
 		Roll baseRoll = advantage switch
 		{
-			> 0 => new Roll.KeepHighest((uint)(advantage + 1), 1, baseDie),
-			< 0 => new Roll.KeepLowest((uint)-(advantage + 1), 1, baseDie),
+			> 0 => new Roll.KeepHighest(rollCount, 1, baseDie),
+			< 0 => new Roll.KeepLowest(rollCount, 1, baseDie),
 			_   => baseDie
 		};
 
@@ -102,16 +105,15 @@ public sealed class CombatComponent : IComponent
 	public CheckResult RollCheck(StatsComponent.Attribute attribute, int bonus = 0, int advantage = 0)
 	{
 		var baseDie = Roll.Die.D20;
-		Roll baseRoll = baseDie;
 
-		if (advantage > 0)
+		var rollCount = (uint)(Math.Abs(advantage) + 1);
+		
+		Roll baseRoll = advantage switch
 		{
-			baseRoll = new Roll.KeepHighest((uint)advantage, 1, baseDie);
-		}
-		else if (advantage < 0)
-		{
-			baseRoll = new Roll.KeepLowest((uint)(-advantage), 1, baseDie);
-		}
+			> 0 => new Roll.KeepHighest(rollCount, 1, baseDie),
+			< 0 => new Roll.KeepLowest(rollCount, 1, baseDie),
+			_   => baseDie
+		};
 		
 		var checkRoll = baseRoll + statsComponent.GetAttribute(attribute) / 2 + bonus;
 		var checkRollResult = checkRoll.Execute();
