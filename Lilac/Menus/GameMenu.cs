@@ -6,6 +6,7 @@ using Lilac.Rendering;
 using Lilac.Entities.Creatures;  
 using Lilac.Maps;
 using Lilac.Combat;
+using Lilac.Entities;
 
 namespace Lilac.Menus;
 
@@ -386,6 +387,11 @@ public sealed class GameMenu : MenuContainer
 						{
 							selected = () =>
 							{
+								if (currentBattleMember is Entity entity)
+								{
+									var evasionEffect = new StatusEffect.Evading(entity);
+									entity.GetComponent<StatusComponent>()?.Inflict(evasionEffect);
+								}
 								
 								currentBattleMember.EndTurn();
 							}
