@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Lilac.Dice;
 using Lilac.Combat;
@@ -74,9 +75,9 @@ public sealed class CombatComponent : IComponent
 	}
 	public int Evasion => 10 + statsComponent.Agility / 2;
 
-	public AttackResult RollAttack()
+	public AttackResult RollAttack(CombatComponent? targetComponent)
 	{
-		var advantage = battleState.AttackAdvantage;
+		var advantage = battleState.AttackAdvantage - (targetComponent?.battleState.DefenseAdvantage ?? 0);
 		var baseDie = Roll.Die.D20;
 
 		if (Game.Singleton?.CurrentDifficulty == Game.Difficulty.Easy)
@@ -169,6 +170,7 @@ public sealed class CombatComponent : IComponent
 		public int Initiative { get; set; }
 		public bool Hidden { get; set; }
 		public int AttackAdvantage { get; set; }
+		public int DefenseAdvantage { get; set; }
 		public int CriticalChanceBonus { get; set; }
 		public int CriticalDamageBonus { get; set; }
 	}

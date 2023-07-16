@@ -117,7 +117,11 @@ public abstract class Creature : Entity, IHittable, IBattleMember, IAttacker
         if (GetComponent<CombatComponent>() is not { } combatComponent)
             return false;
 
-        var attackRollResult = combatComponent.RollAttack();
+        CombatComponent? targetCombatComponent = null;
+        if (target is Entity entity)
+            targetCombatComponent = entity.GetComponent<CombatComponent>();
+
+        var attackRollResult = combatComponent.RollAttack(targetCombatComponent);
         var criticalHit = false;
         var hit = false;
 
