@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Lilac.Combat;
+using Lilac.Rendering;
 
 namespace Lilac.Components;
 
@@ -75,6 +76,14 @@ public sealed class StatusComponent : IComponent
 		foreach (var effect in statusEffects)
 		{
 			effect.OnTurnEnded();
+		}
+	}
+
+	public void Render()
+	{
+		foreach (var effect in statusEffects)
+		{
+			Screen.Write(effect.DisplayIcon);
 		}
 	}
 }

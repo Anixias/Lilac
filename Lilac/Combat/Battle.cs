@@ -137,6 +137,13 @@ public sealed class Battle
 				Screen.Write(" ");
 			
 			Drawing.DrawBar(8, healthComponent.Percent, StandardColor.DarkRed);
+
+			if (entity.GetComponent<StatusComponent>() is { } statusComponent)
+			{
+				Screen.Write(" ");
+				statusComponent.Render();
+			}
+
 			Screen.WriteLine();
 		}
 
