@@ -9,7 +9,6 @@ namespace Lilac.Entities.Creatures;
 
 public abstract class Creature : Entity, IHittable, IBattleMember, IAttacker
 {
-    private readonly List<StatusEffect> statusEffects = new();
     private readonly Dictionary<IRelationship, RelationshipState> relationships = new();
     private readonly List<Allegiance> allegiances = new();
     private RelationshipState defaultRelationship = RelationshipState.Neutral;
@@ -26,12 +25,14 @@ public abstract class Creature : Entity, IHittable, IBattleMember, IAttacker
         var levelComponent = new LevelComponent();
         var statsComponent = new StatsComponent(healthComponent, manaComponent, levelComponent);
         var combatComponent = new CombatComponent(statsComponent);
+        var statusComponent = new StatusComponent();
 
         AddComponent(healthComponent);
         AddComponent(manaComponent);
         AddComponent(levelComponent);
         AddComponent(statsComponent);
         AddComponent(combatComponent);
+        AddComponent(statusComponent);
     }
 
     protected Creature(string species, int level)
@@ -68,7 +69,7 @@ public abstract class Creature : Entity, IHittable, IBattleMember, IAttacker
 	public bool IsUser => GetComponent<IController>()?.IsUser ?? false;
     public string Species { get; }
 
-    protected void Render(string name)
+    protected static void Render(string name)
     {
         Screen.Write(name);
     }
@@ -190,26 +191,17 @@ public abstract class Creature : Entity, IHittable, IBattleMember, IAttacker
 
     public void TurnStarted()
     {
-        foreach (var effect in statusEffects)
-        {
-            effect.OnTurnStarted();
-        }
+        GetComponent<StatusComponent>()?.TurnStarted();
     }
 
     public void TurnChanged()
     {
-        foreach (var effect in statusEffects)
-        {
-            effect.OnTurnChanged();
-        }
+        GetComponent<StatusComponent>()?.TurnChanged();
     }
 
     public void TurnEnded()
     {
-        foreach (var effect in statusEffects)
-        {
-            effect.OnTurnEnded();
-        }
+        GetComponent<StatusComponent>()?.TurnEnded();
     }
 
     protected void JoinAllegiance(Allegiance allegiance)

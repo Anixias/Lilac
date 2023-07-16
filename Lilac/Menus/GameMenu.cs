@@ -382,7 +382,14 @@ public sealed class GameMenu : MenuContainer
 						{
 							selected = () => currentPage = Page.Attack
 						},
-						new Option("Evade"),
+						new Option("Evade")
+						{
+							selected = () =>
+							{
+								
+								currentBattleMember.EndTurn();
+							}
+						},
 						new Option("Hide"),
 						new Option("Prepare"),
 						new Option("Use"),

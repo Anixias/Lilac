@@ -24,7 +24,7 @@ public abstract class StatusEffect
 	public abstract string DisplayName { get; }
 	public abstract string Description { get; }
 	public abstract int Duration { get; }
-	public int TurnsLeft { get; protected set; }
+	public int TurnsLeft { get; set; }
 	
 	/// <summary>Called at the start of the affected creature's turn.</summary>
 	public virtual void OnTurnStarted() {}
