@@ -1,3 +1,4 @@
+using Lilac.Components;
 using Lilac.Entities.Creatures;
 
 namespace Lilac.Combat;
@@ -72,6 +73,14 @@ public abstract class StatusEffect
 											  "Advantage to all attacks received until the start of its next turn.";
 
 		public override int Duration => 1;
+
+		public override void OnInflicted()
+		{
+			if (Creature.GetComponent<CombatComponent>() is not { } combatComponent)
+				return;
+
+			combatComponent.battleState.DefenseAdvantage += 1;
+		}
 	}
 
 	public sealed class Bleeding : StatusEffect
