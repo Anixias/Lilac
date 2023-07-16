@@ -68,6 +68,8 @@ public abstract class Prompt : IMenu
             case ConsoleKey.Escape:
                 return false;
             case ConsoleKey.Enter:
+                if (string.IsNullOrWhiteSpace(Input))
+                    break;
                 OnInputSubmitted?.Invoke(Input);
                 Input = "";
                 break;

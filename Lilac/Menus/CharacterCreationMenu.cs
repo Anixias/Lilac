@@ -120,7 +120,8 @@ public sealed class CharacterCreationMenu : MenuContainer
                         10 => StandardColor.Magenta,
                         11 => StandardColor.DarkMagenta,
                         _  => StandardColor.White
-                    }
+                    },
+                    Cycle = true
                 },
                 new Option("Next")
                 {
@@ -164,7 +165,8 @@ public sealed class CharacterCreationMenu : MenuContainer
                         1 => Class.Archer,
                         2 => Class.Mage,
                         _ => throw new Exception("Invalid class id.")
-                    }
+                    },
+                    Cycle = true
                 },
                 new Option("Next")
                 {
@@ -212,7 +214,8 @@ public sealed class CharacterCreationMenu : MenuContainer
                         3 => Race.Orc,
                         4 => Race.Halfling,
                         _ => throw new Exception("Invalid race id.")
-                    }
+                    },
+                    Cycle = true
                 },
                 new Option("Next")
                 {

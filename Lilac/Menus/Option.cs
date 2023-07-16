@@ -19,6 +19,7 @@ public sealed class Option
 	public string[] Values { get; }
 	public int SelectedValue { get; set; }
 	public string Label { get; }
+	public bool Cycle { get; init; } = false;
 
 	public Action? selected;
 	public Action<int>? valueChanged;
@@ -32,8 +33,8 @@ public sealed class Option
 		
 		if (Values.Length > 0)
 		{
-			var prevArrow = SelectedValue > 0 ? "<- " : "   ";
-			var nextArrow = SelectedValue < Values.Length - 1 ? " ->" : "";
+			var prevArrow = SelectedValue > 0 || Cycle ? "<- " : "   ";
+			var nextArrow = SelectedValue < Values.Length - 1 || Cycle ? " ->" : "";
 			Screen.Write($": {prevArrow}{Values[SelectedValue]}{nextArrow}");
 		}
 
@@ -43,19 +44,25 @@ public sealed class Option
 
 	public void SelectPrevious()
 	{
-		if (SelectedValue <= 0)
+		if ((SelectedValue <= 0) && !Cycle)
 			return;
-		
+
 		SelectedValue--;
+		if (SelectedValue < 0)
+			SelectedValue += Values.Length;
+
 		valueChanged?.Invoke(SelectedValue);
 	}
 
 	public void SelectNext()
 	{
-		if (SelectedValue >= Values.Length - 1)
+		if ((SelectedValue >= Values.Length - 1) && !Cycle)
 			return;
-		
+
 		SelectedValue++;
+		if (SelectedValue >= Values.Length)
+			SelectedValue = 0;
+
 		valueChanged?.Invoke(SelectedValue);
 	}
 
