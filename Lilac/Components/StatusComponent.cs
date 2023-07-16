@@ -51,15 +51,18 @@ public sealed class StatusComponent : IComponent
 		for (var i = 0; i < statusEffects.Count; i++)
 		{
 			var effect = statusEffects[i];
-			effect.TurnsLeft--;
-
-			if (effect.TurnsLeft <= 0)
+			if (effect.TickOnTurnStart)
 			{
-				effect.OnExpired();
-				statusEffects.RemoveAt(i--);
-				continue;
+				effect.TurnsLeft--;
+
+				if (effect.TurnsLeft <= 0)
+				{
+					effect.OnExpired();
+					statusEffects.RemoveAt(i--);
+					continue;
+				}
 			}
-			
+
 			effect.OnTurnStarted();
 			
 			if (!statusEffects.Contains(effect))
@@ -84,6 +87,18 @@ public sealed class StatusComponent : IComponent
 		for (var i = 0; i < statusEffects.Count; i++)
 		{
 			var effect = statusEffects[i];
+			if (!effect.TickOnTurnStart)
+			{
+				effect.TurnsLeft--;
+
+				if (effect.TurnsLeft < 0)
+				{
+					effect.OnExpired();
+					statusEffects.RemoveAt(i--);
+					continue;
+				}
+			}
+
 			effect.OnTurnEnded();
 			
 			if (!statusEffects.Contains(effect))

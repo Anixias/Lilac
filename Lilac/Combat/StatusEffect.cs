@@ -21,6 +21,7 @@ public abstract class StatusEffect
 	}
 	
 	private Entity Entity { get; }
+	public abstract bool TickOnTurnStart { get;  }
 	public abstract StatusEffectAlignment Alignment { get; }
 	public abstract string DisplayIcon { get; }
 	public abstract string DisplayName { get; }
@@ -81,6 +82,7 @@ public abstract class StatusEffect
 											  "Advantage to all attacks received until the start of its next turn.";
 
 		public override int Duration => 1;
+		public override bool TickOnTurnStart => true;
 
 		public override void OnInflicted()
 		{
@@ -110,7 +112,8 @@ public abstract class StatusEffect
 		public override string Description => "The affected creature is focusing on preparing an attack, gaining +1 " +
 											  "Advantage to its next attack for 1 turn.";
 
-		public override int Duration => 2;
+		public override int Duration => 1;
+		public override bool TickOnTurnStart => false;
 
 		public override void OnInflicted()
 		{
@@ -120,10 +123,7 @@ public abstract class StatusEffect
 
 		public override void OnAttacked()
 		{
-			OnExpired();
-
-			if (Entity.GetComponent<StatusComponent>() is { } statusComponent)
-				statusComponent.Remove(this);
+			TurnsLeft = 0;
 		}
 
 		public override void OnExpired()
@@ -145,6 +145,7 @@ public abstract class StatusEffect
         public override string DisplayName => "Bleeding";
         public override string Description => "The affected creature is receiving 1 raw damage at the start of its turns.";
         public override int Duration => 3;
+		public override bool TickOnTurnStart => true;
 
 		public override void OnTurnStarted()
 		{
@@ -165,6 +166,7 @@ public abstract class StatusEffect
         public override string DisplayName => "Stunned";
         public override string Description => "The affected creature is losing its turns.";
         public override int Duration => 2;
+		public override bool TickOnTurnStart => true;
 
 		public override void OnTurnStarted()
 		{
