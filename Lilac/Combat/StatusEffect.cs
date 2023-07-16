@@ -1,5 +1,5 @@
 using Lilac.Components;
-using Lilac.Entities.Creatures;
+using Lilac.Entities;
 
 namespace Lilac.Combat;
 
@@ -10,15 +10,17 @@ public enum StatusEffectAlignment : byte
 	Neutral
 }
 
-/// <summary>An object that represents a prolonged effect on a <see cref="Creature"/>.</summary>
+/// <summary>
+/// An object that represents a prolonged effect affecting an <see cref="Entity"/>.
+/// </summary>
 public abstract class StatusEffect
 {
-	private StatusEffect(Creature creature)
+	private StatusEffect(Entity entity)
 	{
-		Creature = creature;
+		Entity = entity;
 	}
 	
-	private Creature Creature { get; }
+	private Entity Entity { get; }
 	public abstract StatusEffectAlignment Alignment { get; }
 	public abstract string DisplayIcon { get; }
 	public abstract string DisplayName { get; }
@@ -44,8 +46,8 @@ public abstract class StatusEffect
 	/// <summary>A <see cref="StatusEffect"/> that triggers and then expires instantly.</summary>
 	public abstract class InstantStatusEffect : StatusEffect
 	{
-		public InstantStatusEffect(Creature creature)
-		: base(creature)
+		public InstantStatusEffect(Entity entity)
+		: base(entity)
 		{
 		}
 		
@@ -59,8 +61,8 @@ public abstract class StatusEffect
 
 	public sealed class Evading : StatusEffect
 	{
-		public Evading(Creature creature)
-			: base(creature)
+		public Evading(Entity entity)
+			: base(entity)
 		{
 			
 		}
@@ -76,17 +78,21 @@ public abstract class StatusEffect
 
 		public override void OnInflicted()
 		{
-			if (Creature.GetComponent<CombatComponent>() is not { } combatComponent)
-				return;
+			if (Entity.GetComponent<CombatComponent>() is { } combatComponent)
+				combatComponent.battleState.DefenseAdvantage += 1;
+		}
 
-			combatComponent.battleState.DefenseAdvantage += 1;
+		public override void OnExpired()
+		{
+			if (Entity.GetComponent<CombatComponent>() is { } combatComponent)
+				combatComponent.battleState.DefenseAdvantage -= 1;
 		}
 	}
 
 	public sealed class Bleeding : StatusEffect
     {
-		public Bleeding(Creature creature) 
-			: base(creature)
+		public Bleeding(Entity entity) 
+			: base(entity)
 		{
 		}
 		
@@ -98,14 +104,15 @@ public abstract class StatusEffect
 
 		public override void OnTurnStarted()
 		{
-			Creature.ReceiveDamage(DamageType.Raw.CreateDamage(1));
+			if (Entity is IHittable hittable)
+				hittable.ReceiveDamage(DamageType.Raw.CreateDamage(1));
 		}
     }
 
     public sealed class Stunned : StatusEffect
     {
-		public Stunned(Creature creature)
-		: base(creature)
+		public Stunned(Entity entity)
+		: base(entity)
 		{
 		}
 		
@@ -117,7 +124,8 @@ public abstract class StatusEffect
 
 		public override void OnTurnStarted()
 		{
-			Creature.EndTurn();
+			if (Entity is IBattleMember battleMember)
+				battleMember.EndTurn();
 		}
     }
 }
