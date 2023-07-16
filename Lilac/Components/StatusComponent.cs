@@ -82,9 +82,13 @@ public sealed class StatusComponent : IComponent
 
 	public void Attacked()
 	{
-		foreach (var effect in statusEffects)
+		for (var i = 0; i < statusEffects.Count; i++)
 		{
+			var effect = statusEffects[i];
 			effect.OnAttacked();
+
+			if (!statusEffects.Contains(effect))
+				i--;
 		}
 	}
 
