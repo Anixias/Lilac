@@ -56,15 +56,33 @@ public abstract class StatusEffect
 		public sealed override void OnExpired() {}
 	}
 
-    public sealed class Bleeding : StatusEffect
+	public sealed class Evading : StatusEffect
+	{
+		public Evading(Creature creature)
+			: base(creature)
+		{
+			
+		}
+
+		public override StatusEffectAlignment Alignment => StatusEffectAlignment.Positive;
+		public override string DisplayIcon => "(Ev)";
+		public override string DisplayName => "Evading";
+
+		public override string Description => "The affected creature is focusing on avoiding attacks, granting -1 " +
+											  "Advantage to all attacks received until the start of its next turn.";
+
+		public override int Duration => 1;
+	}
+
+	public sealed class Bleeding : StatusEffect
     {
-		public Bleeding(Creature creature)
-		: base(creature)
+		public Bleeding(Creature creature) 
+			: base(creature)
 		{
 		}
 		
         public override StatusEffectAlignment Alignment => StatusEffectAlignment.Negative;
-        public override string DisplayIcon => "(B)";
+        public override string DisplayIcon => "(Bl)";
         public override string DisplayName => "Bleeding";
         public override string Description => "The affected creature is receiving 1 raw damage at the start of its turns.";
         public override int Duration => 3;
@@ -83,7 +101,7 @@ public abstract class StatusEffect
 		}
 		
         public override StatusEffectAlignment Alignment => StatusEffectAlignment.Negative;
-        public override string DisplayIcon => "(S)";
+        public override string DisplayIcon => "(St)";
         public override string DisplayName => "Stunned";
         public override string Description => "The affected creature is losing its turns.";
         public override int Duration => 2;
