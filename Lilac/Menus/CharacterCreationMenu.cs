@@ -1,5 +1,6 @@
 using System;
 using Lilac.Entities;
+using Lilac.Rendering;
 
 namespace Lilac.Menus;
 
@@ -62,15 +63,15 @@ public sealed class CharacterCreationMenu : MenuContainer
 
     protected override void RenderContainerTitle()
     {
-        Console.ForegroundColor = ConsoleColor.Blue;
+        Screen.ForegroundColor = StandardColor.Blue;
 
-        Console.Write("# ========= ");
-        Console.ForegroundColor = ConsoleColor.Cyan;
-        Console.Write("Character Creation");
-        Console.ForegroundColor = ConsoleColor.Blue;
-        Console.WriteLine(" ========= #");
+        Screen.Write("# ========= ");
+        Screen.ForegroundColor = StandardColor.Cyan;
+        Screen.Write("Character Creation");
+        Screen.ForegroundColor = StandardColor.Blue;
+        Screen.WriteLine(" ========= #");
 
-        Console.ResetColor();
+        Screen.ResetColor();
     }
 
     private sealed class PlayerNameMenu : Prompt
@@ -88,17 +89,17 @@ public sealed class CharacterCreationMenu : MenuContainer
 
     private sealed class PlayerColorMenu : Menu
     {
-        public delegate void ColorEventHandler(ConsoleColor color);
+        public delegate void ColorEventHandler(IColor color);
         public event ColorEventHandler? OnColorSelected;
         public event EventHandler? OnBackSelected;
 
-        private ConsoleColor selectedColor;
+        private StandardColor selectedColor;
         private readonly string displayName;
 
         public PlayerColorMenu(string characterName)
         {
             displayName = characterName;
-            selectedColor = ConsoleColor.Red;
+            selectedColor = StandardColor.Red;
 
             Options = new[]
             {
@@ -106,19 +107,19 @@ public sealed class CharacterCreationMenu : MenuContainer
                 {
                     valueChanged = value => selectedColor = value switch
                     {
-                        0 => ConsoleColor.Red,
-                        1 => ConsoleColor.DarkRed,
-                        2 => ConsoleColor.Yellow,
-                        3 => ConsoleColor.DarkYellow,
-                        4 => ConsoleColor.Green,
-                        5 => ConsoleColor.DarkGreen,
-                        6 => ConsoleColor.Cyan,
-                        7 => ConsoleColor.DarkCyan,
-                        8 => ConsoleColor.Blue,
-                        9 => ConsoleColor.DarkBlue,
-                        10 => ConsoleColor.Magenta,
-                        11 => ConsoleColor.DarkMagenta,
-                        _ => ConsoleColor.White
+                        0  => StandardColor.Red,
+                        1  => StandardColor.DarkRed,
+                        2  => StandardColor.Yellow,
+                        3  => StandardColor.DarkYellow,
+                        4  => StandardColor.Green,
+                        5  => StandardColor.DarkGreen,
+                        6  => StandardColor.Cyan,
+                        7  => StandardColor.DarkCyan,
+                        8  => StandardColor.Blue,
+                        9  => StandardColor.DarkBlue,
+                        10 => StandardColor.Magenta,
+                        11 => StandardColor.DarkMagenta,
+                        _  => StandardColor.White
                     }
                 },
                 new Option("Next")
@@ -134,10 +135,10 @@ public sealed class CharacterCreationMenu : MenuContainer
 
         public override void RenderTitle()
         {
-            Console.WriteLine("Select a color for your name and HUD:\n");
-            Console.ForegroundColor = selectedColor;
-            Console.WriteLine(displayName);
-            Console.WriteLine();
+            Screen.WriteLine("Select a color for your name and HUD:\n");
+            Screen.ForegroundColor = selectedColor;
+            Screen.WriteLine(displayName);
+            Screen.WriteLine();
         }
     }
 

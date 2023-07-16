@@ -1,26 +1,27 @@
 using System;
 using Lilac;
+using Lilac.Rendering;
 
 internal static class Program
 {
 	public static void Main(string[] args)
 	{
 		// Setup The Console
-		Console.Write("\x1b[?1049h");        // switch terminal buffer
-		Console.CursorVisible = false;
-		Console.Clear();
+		Screen.SwapActiveBuffer();
+		Screen.CursorVisible = false;
+		Screen.Clear();
 		
 		try
 		{
 			var game = new Game();
 			game.Start();
 
-			Console.Clear();
+			Screen.Clear();
 		}
 		finally
 		{
-			Console.CursorVisible = true;
-			Console.Write("\x1b[?1049l");    // switch back from terminal buffer
+			Screen.CursorVisible = true;
+			Screen.SwapActiveBuffer();
 		}
 	}
 }

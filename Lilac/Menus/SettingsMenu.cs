@@ -1,4 +1,5 @@
 using System;
+using Lilac.Rendering;
 
 namespace Lilac.Menus;
 
@@ -32,15 +33,15 @@ public sealed class SettingsMenu : Menu
 
 	public override void RenderTitle()
 	{
-		Console.ForegroundColor = ConsoleColor.Blue;
+		Screen.ForegroundColor = StandardColor.Blue;
 
-		Console.Write("# =========== ");
-		Console.ForegroundColor = ConsoleColor.Cyan;
-		Console.Write("Settings");
-		Console.ForegroundColor = ConsoleColor.Blue;
-		Console.WriteLine(" =========== #");
+		Screen.Write("# =========== ");
+		Screen.ForegroundColor = StandardColor.Cyan;
+		Screen.Write("Settings");
+		Screen.ForegroundColor = StandardColor.Blue;
+		Screen.WriteLine(" =========== #");
 
-		Console.ResetColor();
+		Screen.ResetColor();
 	}
 
 	public void SetDifficulty(Game.Difficulty difficulty)

@@ -1,5 +1,5 @@
-using System;
 using System.Collections.Generic;
+using Lilac.Rendering;
 
 namespace Lilac.Maps;
 
@@ -10,8 +10,8 @@ public sealed class Meadows : IMap
 	}
 	
     public string Name => "Meadows";
-    public ConsoleColor PrimaryColor => ConsoleColor.Yellow;
-    public ConsoleColor SecondaryColor => ConsoleColor.Green;
+    public IColor PrimaryColor => StandardColor.Yellow;
+    public IColor SecondaryColor => StandardColor.Green;
 }
 
 public abstract class MeadowsTile : ITile

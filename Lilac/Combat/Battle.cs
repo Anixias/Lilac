@@ -108,20 +108,21 @@ public sealed class Battle
 	{
 		for (var i = 0; i < battleMembers.Count; i++)
 		{
-			Console.ResetColor();
+			Screen.ResetColor();
 			var battleMember = battleMembers[i];
 
-			Console.ForegroundColor = battleMember.IsDead ? ConsoleColor.DarkGray : ConsoleColor.Green;
+			Screen.ForegroundColor = battleMember.IsDead ? StandardColor.DarkGray : StandardColor.Green;
+			Screen.Strikethrough = battleMember.IsDead;
 			
-			Console.Write(i == currentTurn ? " -> " : (battleMember.IsDead ? "  X " : "    "));
-			Console.ResetColor();
+			Screen.Write(i == currentTurn ? " -> " : (battleMember.IsDead ? "  X " : "    "));
+			Screen.ResetColor();
 
 			if (battleMember.IsDead)
-				Console.ForegroundColor = ConsoleColor.DarkGray;
+				Screen.ForegroundColor = StandardColor.DarkGray;
 
 			if (battleMember is not Entity entity)
 			{
-				Console.WriteLine("Unknown");
+				Screen.WriteLine("Unknown");
 				continue;
 			}
 
@@ -135,8 +136,10 @@ public sealed class Battle
 			while (Console.CursorLeft < 20)
 				Console.Write(" ");
 			
-			Drawing.DrawBar(8, healthComponent.Percent, ConsoleColor.DarkRed);
+			Drawing.DrawBar(8, healthComponent.Percent, StandardColor.DarkRed);
 			Console.WriteLine();
 		}
+
+		Screen.Strikethrough = false;
 	}
 }

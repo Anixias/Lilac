@@ -1,5 +1,5 @@
-using System;
 using System.Collections.Generic;
+using Lilac.Rendering;
 
 namespace Lilac.Maps;
 
@@ -17,8 +17,8 @@ public sealed class EmberGuild : IMap
 	}
 	
     public string Name => "Ember Guild";
-    public ConsoleColor PrimaryColor => ConsoleColor.Red;
-    public ConsoleColor SecondaryColor => ConsoleColor.DarkYellow;
+    public IColor PrimaryColor => StandardColor.Red;
+    public IColor SecondaryColor => StandardColor.DarkYellow;
 
 	public EmberGuildTile GuildHall { get; private set; }
 

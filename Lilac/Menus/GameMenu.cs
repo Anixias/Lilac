@@ -64,35 +64,35 @@ public sealed class GameMenu : MenuContainer
 		if (player is not null)
 		{
 			player.Render();
-			Console.WriteLine($" - Level {player.Level} {player.Character.Race.DisplayName} {player.Character.Class.DisplayName}");
+			Screen.WriteLine($" - Level {player.Level} {player.Character.Race.DisplayName} {player.Character.Class.DisplayName}");
 
-			Console.Write($"XP: {player.XP}/{player.MaxXP} ".PadRight(16));
-			Drawing.DrawBar(16, player.XP / (double)player.MaxXP, ConsoleColor.Yellow);
-			Console.WriteLine();
+			Screen.Write($"XP: {player.XP}/{player.MaxXP} ".PadRight(16));
+			Drawing.DrawBar(16, player.XP / (double)player.MaxXP, StandardColor.Yellow);
+			Screen.WriteLine();
 			
-			Console.Write($"HP: {player.Health}/{player.MaxHealth} ".PadRight(16));
-			Drawing.DrawBar(16, player.Health / (double)player.MaxHealth, ConsoleColor.DarkRed);
-			Console.WriteLine();
+			Screen.Write($"HP: {player.Health}/{player.MaxHealth} ".PadRight(16));
+			Drawing.DrawBar(16, player.Health / (double)player.MaxHealth, StandardColor.DarkRed);
+			Screen.WriteLine();
 			
-			Console.Write($"MP: {player.Mana}/{player.MaxMana} ".PadRight(16));
-			Drawing.DrawBar(16, player.Mana / (double)player.MaxMana, ConsoleColor.DarkBlue);
-			Console.WriteLine();
+			Screen.Write($"MP: {player.Mana}/{player.MaxMana} ".PadRight(16));
+			Drawing.DrawBar(16, player.Mana / (double)player.MaxMana, StandardColor.DarkBlue);
+			Screen.WriteLine();
 			
-			Console.WriteLine();
+			Screen.WriteLine();
 
 			const int controlPadding = 12;
 			if (showControls)
 			{
-				Console.WriteLine("Alt + I".PadRight(controlPadding) + "Toggle controls");
-				Console.WriteLine("- Escape".PadRight(controlPadding) + "Toggle pause menu");
-				Console.WriteLine("- Alt + P".PadRight(controlPadding) + "Party Info");
-				Console.WriteLine("- Tab".PadRight(controlPadding) + "Inventory");
+				Screen.WriteLine("Alt + I".PadRight(controlPadding) + "Toggle controls");
+				Screen.WriteLine("- Escape".PadRight(controlPadding) + "Toggle pause menu");
+				Screen.WriteLine("- Alt + P".PadRight(controlPadding) + "Party Info");
+				Screen.WriteLine("- Tab".PadRight(controlPadding) + "Inventory");
 			}
 			else
 			{
-				Console.ForegroundColor = ConsoleColor.DarkGray;
-				Console.WriteLine("Alt + I".PadRight(controlPadding) + "Toggle controls");
-				Console.ResetColor();
+				Screen.ForegroundColor = StandardColor.DarkGray;
+				Screen.WriteLine("Alt + I".PadRight(controlPadding) + "Toggle controls");
+				Screen.ResetColor();
 			}
 		}
     }
@@ -156,13 +156,13 @@ public sealed class GameMenu : MenuContainer
 		
         public override void RenderTitle()
         {
-            Console.ForegroundColor = ConsoleColor.DarkBlue;
-	        Console.Write("# ========= ");
-	        Console.ForegroundColor = ConsoleColor.Cyan;
-	        Console.Write("Character Information");
-	        Console.ForegroundColor = ConsoleColor.DarkBlue;
-	        Console.WriteLine(" ========= #");
-			Console.ResetColor();
+            Screen.ForegroundColor = StandardColor.DarkBlue;
+	        Screen.Write("# ========= ");
+	        Screen.ForegroundColor = StandardColor.Cyan;
+	        Screen.Write("Character Information");
+	        Screen.ForegroundColor = StandardColor.DarkBlue;
+	        Screen.WriteLine(" ========= #");
+			Screen.ResetColor();
 
 			// Render selected party member
 			if (selectedMember is null)
@@ -171,33 +171,33 @@ public sealed class GameMenu : MenuContainer
 			selectedMember.Render();
 			if (selectedMember.GetComponent<CharacterComponent>() is { } characterComponent)
 			{
-				Console.WriteLine($" - Level {selectedMember.Level} {selectedMember.Species} {characterComponent.Character.Class.DisplayName}");
+				Screen.WriteLine($" - Level {selectedMember.Level} {selectedMember.Species} {characterComponent.Character.Class.DisplayName}");
 			}
 			else
 			{
-				Console.WriteLine($" - Level {selectedMember.Level} {selectedMember.Species}");
+				Screen.WriteLine($" - Level {selectedMember.Level} {selectedMember.Species}");
 			}
 
-			Console.Write($"XP: {selectedMember.XP}/{selectedMember.MaxXP} ".PadRight(16));
-			Drawing.DrawBar(16, selectedMember.XP / (double)selectedMember.MaxXP, ConsoleColor.Yellow);
-			Console.WriteLine();
+			Screen.Write($"XP: {selectedMember.XP}/{selectedMember.MaxXP} ".PadRight(16));
+			Drawing.DrawBar(16, selectedMember.XP / (double)selectedMember.MaxXP, StandardColor.Yellow);
+			Screen.WriteLine();
 			
-			Console.Write($"HP: {selectedMember.Health}/{selectedMember.MaxHealth} ".PadRight(16));
-			Drawing.DrawBar(16, selectedMember.Health / (double)selectedMember.MaxHealth, ConsoleColor.DarkRed);
-			Console.WriteLine();
+			Screen.Write($"HP: {selectedMember.Health}/{selectedMember.MaxHealth} ".PadRight(16));
+			Drawing.DrawBar(16, selectedMember.Health / (double)selectedMember.MaxHealth, StandardColor.DarkRed);
+			Screen.WriteLine();
 			
-			Console.Write($"MP: {selectedMember.Mana}/{selectedMember.MaxMana} ".PadRight(16));
-			Drawing.DrawBar(16, selectedMember.Mana / (double)selectedMember.MaxMana, ConsoleColor.DarkBlue);
-			Console.WriteLine();
-			Console.WriteLine();
+			Screen.Write($"MP: {selectedMember.Mana}/{selectedMember.MaxMana} ".PadRight(16));
+			Drawing.DrawBar(16, selectedMember.Mana / (double)selectedMember.MaxMana, StandardColor.DarkBlue);
+			Screen.WriteLine();
+			Screen.WriteLine();
 	
-            Console.ForegroundColor = ConsoleColor.DarkGray;
-			Console.Write("# ========= ");
-	        Console.ForegroundColor = ConsoleColor.DarkMagenta;
-	        Console.Write(pageTitles[(int)selectedPage]);
-	        Console.ForegroundColor = ConsoleColor.DarkGray;
-	        Console.WriteLine(" ========= #");
-	        Console.ResetColor();
+            Screen.ForegroundColor = StandardColor.DarkGray;
+			Screen.Write("# ========= ");
+	        Screen.ForegroundColor = StandardColor.DarkMagenta;
+	        Screen.Write(pageTitles[(int)selectedPage]);
+	        Screen.ForegroundColor = StandardColor.DarkGray;
+	        Screen.WriteLine(" ========= #");
+	        Screen.ResetColor();
 
 			switch (selectedPage)
 			{
@@ -205,81 +205,81 @@ public sealed class GameMenu : MenuContainer
 					if (selectedMember.GetComponent<StatsComponent>() is not { } statsComponent)
 						break;
 					
-					Console.WriteLine();
-					Console.ResetColor();
+					Screen.WriteLine();
+					Screen.ResetColor();
 	
-					const ConsoleColor attributeColor = ConsoleColor.DarkBlue;
+					var attributeColor = StandardColor.DarkBlue;
 					
-					Console.Write("Strength: ".PadRight(16));
-					Console.ForegroundColor = attributeColor;
-					Console.WriteLine(statsComponent.Strength);
-					Console.ResetColor();
+					Screen.Write("Strength: ".PadRight(16));
+					Screen.ForegroundColor = attributeColor;
+					Screen.WriteLine(statsComponent.Strength);
+					Screen.ResetColor();
 					
-					Console.Write("Agility: ".PadRight(16));
-					Console.ForegroundColor = attributeColor;
-					Console.WriteLine(statsComponent.Agility);
-					Console.ResetColor();
+					Screen.Write("Agility: ".PadRight(16));
+					Screen.ForegroundColor = attributeColor;
+					Screen.WriteLine(statsComponent.Agility);
+					Screen.ResetColor();
 					
-					Console.Write("Intelligence: ".PadRight(16));
-					Console.ForegroundColor = attributeColor;
-					Console.WriteLine(statsComponent.Intelligence);
-					Console.ResetColor();
+					Screen.Write("Intelligence: ".PadRight(16));
+					Screen.ForegroundColor = attributeColor;
+					Screen.WriteLine(statsComponent.Intelligence);
+					Screen.ResetColor();
 					
-					Console.Write("Constitution: ".PadRight(16));
-					Console.ForegroundColor = attributeColor;
-					Console.WriteLine(statsComponent.Constitution);
-					Console.ResetColor();
+					Screen.Write("Constitution: ".PadRight(16));
+					Screen.ForegroundColor = attributeColor;
+					Screen.WriteLine(statsComponent.Constitution);
+					Screen.ResetColor();
 					
-					Console.Write("Perception: ".PadRight(16));
-					Console.ForegroundColor = attributeColor;
-					Console.WriteLine(statsComponent.Perception);
-					Console.ResetColor();
+					Screen.Write("Perception: ".PadRight(16));
+					Screen.ForegroundColor = attributeColor;
+					Screen.WriteLine(statsComponent.Perception);
+					Screen.ResetColor();
 					
-					Console.Write("Charisma: ".PadRight(16));
-					Console.ForegroundColor = attributeColor;
-					Console.WriteLine(statsComponent.Charisma);
-					Console.ResetColor();
+					Screen.Write("Charisma: ".PadRight(16));
+					Screen.ForegroundColor = attributeColor;
+					Screen.WriteLine(statsComponent.Charisma);
+					Screen.ResetColor();
 						
-					Console.WriteLine();
+					Screen.WriteLine();
 					break;
 				case InfoPage.Combat:
 					if (selectedMember.GetComponent<CombatComponent>() is not { } combatComponent)
 						break;
 					
-					Console.WriteLine();
-					Console.ResetColor();
+					Screen.WriteLine();
+					Screen.ResetColor();
 	
-					const ConsoleColor combatStatColor = ConsoleColor.Green;
+					var combatStatColor = StandardColor.Green;
 					
-					Console.Write("Initiative: ".PadRight(24));
-					Console.ForegroundColor = combatStatColor;
-					Console.WriteLine(combatComponent.Initiative);
-					Console.ResetColor();
+					Screen.Write("Initiative: ".PadRight(24));
+					Screen.ForegroundColor = combatStatColor;
+					Screen.WriteLine(combatComponent.Initiative);
+					Screen.ResetColor();
 					
-					Console.Write("Evasion: ".PadRight(24));
-					Console.ForegroundColor = combatStatColor;
-					Console.WriteLine(combatComponent.Evasion);
-					Console.ResetColor();
+					Screen.Write("Evasion: ".PadRight(24));
+					Screen.ForegroundColor = combatStatColor;
+					Screen.WriteLine(combatComponent.Evasion);
+					Screen.ResetColor();
 
 					// Defenses
 					foreach (var physicalDamageType in DamageType.PhysicalTypes)
 					{
-						Console.Write($"{physicalDamageType.DisplayName} Defense: ".PadRight(24));
-						Console.ForegroundColor = combatStatColor;
-						Console.WriteLine(combatComponent.GetDefense(physicalDamageType));
-						Console.ResetColor();
+						Screen.Write($"{physicalDamageType.DisplayName} Defense: ".PadRight(24));
+						Screen.ForegroundColor = combatStatColor;
+						Screen.WriteLine(combatComponent.GetDefense(physicalDamageType));
+						Screen.ResetColor();
 					}
 
 					// Resistances
 					foreach (var magicalDamageType in DamageType.MagicalTypes)
 					{
-						Console.Write($"{magicalDamageType.DisplayName} Resistance: ".PadRight(24));
-						Console.ForegroundColor = combatStatColor;
-						Console.WriteLine(combatComponent.GetResistance(magicalDamageType));
-						Console.ResetColor();
+						Screen.Write($"{magicalDamageType.DisplayName} Resistance: ".PadRight(24));
+						Screen.ForegroundColor = combatStatColor;
+						Screen.WriteLine(combatComponent.GetResistance(magicalDamageType));
+						Screen.ResetColor();
 					}
 				
-					Console.WriteLine();
+					Screen.WriteLine();
 					break;
 			}
         }
@@ -296,15 +296,15 @@ public sealed class GameMenu : MenuContainer
 
         public override void RenderTitle()
         {
-            Console.ForegroundColor = Tile.Map.SecondaryColor;
-	        Console.Write("# ========= ");
-	        Console.ForegroundColor = Tile.Map.PrimaryColor;
-	        Console.Write($"{Tile.Map.Name} - {Tile.Name}");
-	        Console.ForegroundColor = Tile.Map.SecondaryColor;
-	        Console.WriteLine(" ========= #");
-	        Console.ResetColor();
+            Screen.ForegroundColor = Tile.Map.SecondaryColor;
+	        Screen.Write("# ========= ");
+	        Screen.ForegroundColor = Tile.Map.PrimaryColor;
+	        Screen.Write($"{Tile.Map.Name} - {Tile.Name}");
+	        Screen.ForegroundColor = Tile.Map.SecondaryColor;
+	        Screen.WriteLine(" ========= #");
+	        Screen.ResetColor();
 
-			Console.WriteLine(Tile.Description);
+			Screen.WriteLine(Tile.Description);
         }
     }
 
@@ -333,17 +333,17 @@ public sealed class GameMenu : MenuContainer
 		
 		public override void RenderTitle()
 		{
-			Console.ForegroundColor = ConsoleColor.DarkGray;
-	        Console.Write("# ========= ");
-	        Console.ForegroundColor = ConsoleColor.DarkRed;
-	        Console.Write("Battle");
-	        Console.ForegroundColor = ConsoleColor.DarkGray;
-	        Console.WriteLine(" ========= #");
-			Console.ResetColor();
+			Screen.ForegroundColor = StandardColor.DarkGray;
+	        Screen.Write("# ========= ");
+	        Screen.ForegroundColor = StandardColor.DarkRed;
+	        Screen.Write("Battle");
+	        Screen.ForegroundColor = StandardColor.DarkGray;
+	        Screen.WriteLine(" ========= #");
+			Screen.ResetColor();
 
-			Console.WriteLine();
+			Screen.WriteLine();
 			Battle.Render();
-			Console.WriteLine();
+			Screen.WriteLine();
 		}
 
 		public override void RenderOptions()

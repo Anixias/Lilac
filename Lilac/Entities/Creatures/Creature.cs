@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Lilac.Components;
 using Lilac.Components.Controllers;
 using Lilac.Combat;
+using Lilac.Rendering;
 
 namespace Lilac.Entities.Creatures;
 
@@ -69,7 +70,7 @@ public abstract class Creature : Entity, IHittable, IBattleMember, IAttacker
 
     protected void Render(string name)
     {
-        Console.Write(name);
+        Screen.Write(name);
     }
 
     /// <summary>Prepares this <see cref="Creature"/> for battle by rolling Initiative, setting up Stealth parameters, and more.</summary>

@@ -1,4 +1,4 @@
-using System;
+using Lilac.Rendering;
 
 namespace Lilac.Menus;
 
@@ -29,16 +29,16 @@ public sealed class MainMenu : Menu
 
 	public override void RenderTitle()
 	{
-		Console.ForegroundColor = ConsoleColor.Magenta;
+		Screen.ForegroundColor = StandardColor.Magenta;
 
-		Console.WriteLine("#################################");
-		Console.Write("# =========== ");
-		Console.ForegroundColor = ConsoleColor.Cyan;
-		Console.Write("LILAC");
-		Console.ForegroundColor = ConsoleColor.Magenta;
-		Console.WriteLine(" =========== #");
-		Console.WriteLine("#################################");
+		Screen.WriteLine("#################################");
+		Screen.Write("# =========== ");
+		Screen.ForegroundColor = StandardColor.Cyan;
+		Screen.Write("LILAC");
+		Screen.ForegroundColor = StandardColor.Magenta;
+		Screen.WriteLine(" =========== #");
+		Screen.WriteLine("#################################");
 
-		Console.ResetColor();
+		Screen.ResetColor();
 	}
 }

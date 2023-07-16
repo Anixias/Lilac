@@ -1,4 +1,5 @@
 using System;
+using Lilac.Rendering;
 
 namespace Lilac.Menus;
 
@@ -24,20 +25,20 @@ public sealed class Option
 
 	public void Display(bool hovered)
 	{
-		Console.ForegroundColor = hovered ? ConsoleColor.Green : ConsoleColor.White;
+		Screen.ForegroundColor = hovered ? StandardColor.Green : StandardColor.White;
 		
-		Console.Write($"{(hovered ? "> " : "  ")}");
-		Console.Write(Label);
+		Screen.Write($"{(hovered ? "> " : "  ")}");
+		Screen.Write(Label);
 		
 		if (Values.Length > 0)
 		{
 			var prevArrow = SelectedValue > 0 ? "<- " : "   ";
 			var nextArrow = SelectedValue < Values.Length - 1 ? " ->" : "";
-			Console.Write($": {prevArrow}{Values[SelectedValue]}{nextArrow}");
+			Screen.Write($": {prevArrow}{Values[SelectedValue]}{nextArrow}");
 		}
 
-		Console.WriteLine();
-		Console.ResetColor();
+		Screen.WriteLine();
+		Screen.ResetColor();
 	}
 
 	public void SelectPrevious()

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Lilac.Menus;
 using Lilac.Entities;
 using Lilac.Entities.Creatures;
+using Lilac.Rendering;
 
 namespace Lilac;
 
@@ -96,41 +97,41 @@ public sealed class Game
 
 		while (running)
 		{
-			Console.Clear();
+			Screen.Clear();
 			
 			// Render
 			CurrentMenu?.RenderTitle();
 			CurrentMenu?.RenderOptions();
 
 			// Process
-			var key = Console.ReadKey();
+			var key = Screen.ReadKey();
 
-			if (!(CurrentMenu?.HandleKey(key) ?? false))
+			if (CurrentMenu?.HandleKey(key) ?? false)
+				continue;
+			
+			// Handle Pause Menu
+			if (key.Key != ConsoleKey.Escape)
+				continue;
+				
+			if (CurrentMenu is PauseMenu)
 			{
-				// Handle Pause Menu
-				if (key.Key == ConsoleKey.Escape)
+				menus.Pop();
+			}
+			else if (inGame)
+			{
+				var pauseMenu = new PauseMenu();
+				pauseMenu.OnResumeSelected += () => menus.Pop();
+				pauseMenu.OnQuitToMainMenuSelected += () =>
 				{
-					if (CurrentMenu is PauseMenu)
-					{
-						menus.Pop();
-					}
-					else if (inGame)
-					{
-						var pauseMenu = new PauseMenu();
-						pauseMenu.OnResumeSelected += () => menus.Pop();
-						pauseMenu.OnQuitToMainMenuSelected += () =>
-						{
-							menus.Clear();
-							inGame = false;
-							EndGame();
-							menus.Push(mainMenu);
-						};
+					menus.Clear();
+					inGame = false;
+					EndGame();
+					menus.Push(mainMenu);
+				};
 						
-						pauseMenu.OnQuitToDesktopSelected += () => running = false;
+				pauseMenu.OnQuitToDesktopSelected += () => running = false;
 						
-						menus.Push(pauseMenu);
-					}
-				}
+				menus.Push(pauseMenu);
 			}
 		}
 	}
