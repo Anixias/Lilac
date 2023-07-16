@@ -83,7 +83,7 @@ public sealed class StatusComponent : IComponent
 	{
 		foreach (var effect in statusEffects)
 		{
-			var alignementColor = effect.Alignment switch
+			var alignmentColor = effect.Alignment switch
 			{
 				StatusEffectAlignment.Positive => StandardColor.Green,
 				StatusEffectAlignment.Neutral  => StandardColor.Gray,
@@ -91,7 +91,7 @@ public sealed class StatusComponent : IComponent
 				_                              => StandardColor.Gray
 			};
 
-			Screen.ForegroundColor = alignementColor;
+			Screen.ForegroundColor = alignmentColor;
 			Screen.Write(effect.DisplayIcon);
 			Screen.ResetColor();
 		}
