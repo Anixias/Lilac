@@ -124,4 +124,16 @@ public static class Screen
 			Console.Write($"\x1b[{backgroundColor.PrintBackground()}m");
 		}
 	}
+
+	public static int CursorLeft
+	{
+		get => Console.CursorLeft;
+		set => Console.CursorLeft = value;
+	}
+
+	public static int CursorTop
+	{
+		get => Console.CursorTop;
+		set => Console.CursorTop = value;
+	}
 }

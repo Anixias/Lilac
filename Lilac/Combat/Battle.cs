@@ -129,15 +129,15 @@ public sealed class Battle
 			entity.Render();
 			if (entity.GetComponent<HealthComponent>() is not { } healthComponent)
 			{
-				Console.WriteLine();
+				Screen.WriteLine();
 				continue;
 			}
 
-			while (Console.CursorLeft < 20)
-				Console.Write(" ");
+			while (Screen.CursorLeft < 20)
+				Screen.Write(" ");
 			
 			Drawing.DrawBar(8, healthComponent.Percent, StandardColor.DarkRed);
-			Console.WriteLine();
+			Screen.WriteLine();
 		}
 
 		Screen.Strikethrough = false;
