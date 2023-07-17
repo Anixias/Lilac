@@ -16,12 +16,12 @@ public readonly struct FlashingColor : IColor
 		ForegroundID = foregroundID;
 		BackgroundID = backgroundID;
 	}
-	
+
 	public string PrintForeground()
 	{
 		return $"5;{ForegroundID}";
 	}
-	
+
 	public string PrintBackground()
 	{
 		return $"5;{BackgroundID}";
@@ -36,7 +36,7 @@ public readonly struct FlashingColor : IColor
 	public static readonly FlashingColor DarkCyan = new(36, 46);
 	public static readonly FlashingColor Gray = new(37, 47);
 	public static readonly FlashingColor Default = new(39, 49);
-	
+
 	public static readonly FlashingColor DarkGray = new(90, 100);
 	public static readonly FlashingColor Red = new(91, 101);
 	public static readonly FlashingColor Green = new(92, 102);
@@ -45,7 +45,7 @@ public readonly struct FlashingColor : IColor
 	public static readonly FlashingColor Magenta = new(95, 105);
 	public static readonly FlashingColor Cyan = new(96, 106);
 	public static readonly FlashingColor White = new(97, 107);
-	
+
 	public static readonly FlashingColor Reset = new(0, 0);
 }
 
@@ -57,12 +57,12 @@ public readonly struct StandardColor : IColor
 	{
 		ID = id;
 	}
-	
+
 	public string PrintForeground()
 	{
 		return $"38;5;{ID};25";
 	}
-	
+
 	public string PrintBackground()
 	{
 		return $"48;5;{ID};25";
@@ -76,7 +76,7 @@ public readonly struct StandardColor : IColor
 	public static readonly StandardColor DarkMagenta = new(5);
 	public static readonly StandardColor DarkCyan = new(6);
 	public static readonly StandardColor Gray = new(7);
-	
+
 	public static readonly StandardColor DarkGray = new(8);
 	public static readonly StandardColor Red = new(9);
 	public static readonly StandardColor Green = new(10);

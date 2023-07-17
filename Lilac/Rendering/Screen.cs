@@ -63,48 +63,6 @@ public static class Screen
 		}
 	}
 
-	public static void ResetStyles()
-	{
-		Console.Write("\x1b[0m");
-	}
-
-	public static string? ReadLine() => Console.ReadLine();
-	public static ConsoleKeyInfo ReadKey() => Console.ReadKey();
-	public static int Read() => Console.Read();
-
-	public static void SwapActiveBuffer()
-	{
-		mainBuffer = !mainBuffer;
-		Console.Write(mainBuffer ? "\x1b[?1049l" : "\x1b[?1049h");
-	}
-
-	public static void ResetColor()
-	{
-		foregroundColor = StandardColor.Gray;
-		backgroundColor = FlashingColor.Reset;
-		Console.Write("\x1b[39;49m");
-	}
-
-	public static void Write(object? value)
-	{
-		Console.Write(value);
-	}
-	
-	public static void WriteLine(object? value)
-	{
-		Console.WriteLine(value);
-	}
-
-	public static void WriteLine()
-	{
-		Console.WriteLine();
-	}
-
-	public static void Clear()
-	{
-		Console.Clear();
-	}
-
 	public static IColor ForegroundColor
 	{
 		get => foregroundColor;
@@ -135,5 +93,58 @@ public static class Screen
 	{
 		get => Console.CursorTop;
 		set => Console.CursorTop = value;
+	}
+
+	public static void ResetStyles()
+	{
+		Console.Write("\x1b[0m");
+	}
+
+	public static string? ReadLine()
+	{
+		return Console.ReadLine();
+	}
+
+	public static ConsoleKeyInfo ReadKey()
+	{
+		return Console.ReadKey();
+	}
+
+	public static int Read()
+	{
+		return Console.Read();
+	}
+
+	public static void SwapActiveBuffer()
+	{
+		mainBuffer = !mainBuffer;
+		Console.Write(mainBuffer ? "\x1b[?1049l" : "\x1b[?1049h");
+	}
+
+	public static void ResetColor()
+	{
+		foregroundColor = StandardColor.Gray;
+		backgroundColor = FlashingColor.Reset;
+		Console.Write("\x1b[39;49m");
+	}
+
+	public static void Write(object? value)
+	{
+		Console.Write(value);
+	}
+
+	public static void WriteLine(object? value)
+	{
+		Console.WriteLine(value);
+	}
+
+	public static void WriteLine()
+	{
+		Console.WriteLine();
+	}
+
+	public static void Clear()
+	{
+		Console.Clear();
 	}
 }

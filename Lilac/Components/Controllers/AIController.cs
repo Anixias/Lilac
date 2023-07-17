@@ -17,12 +17,12 @@ public sealed class AIController : IController
 	}
 
 	public bool IsUser => false;
-	
+
 	public void BeginBattle(Battle battle)
 	{
 		this.battle = battle;
 	}
-	
+
 	public void TakeTurn()
 	{
 		if (battle is null)
@@ -30,20 +30,20 @@ public sealed class AIController : IController
 			creature.EndTurn();
 			return;
 		}
-		
+
 		// @TODO Better AI
 		// Select a random enemy, attack them, end turn
-		
+
 		var targets = new List<IHittable>();
 
 		foreach (var battleMember in battle.BattleMembers)
 		{
 			if (battleMember == creature)
 				continue;
-			
+
 			if (battleMember is not IHittable hittable)
 				continue;
-			
+
 			if (creature.GetRelationship(battleMember.Allegiances.ToArray<IRelationship>()) == RelationshipState.Enemy)
 				targets.Add(hittable);
 		}
@@ -54,7 +54,7 @@ public sealed class AIController : IController
 			var target = targets[targetIndex];
 			creature.Attack(target);
 		}
-		
+
 		creature.EndTurn();
 	}
 }

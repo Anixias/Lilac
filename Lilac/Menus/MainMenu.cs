@@ -4,10 +4,6 @@ namespace Lilac.Menus;
 
 public sealed class MainMenu : Menu
 {
-	public event EventHandler? OnPlaySelected;
-	public event EventHandler? OnSettingsSelected;
-	public event EventHandler? OnQuitSelected;
-
 	public MainMenu()
 	{
 		Options = new[]
@@ -26,6 +22,10 @@ public sealed class MainMenu : Menu
 			}
 		};
 	}
+
+	public event EventHandler? OnPlaySelected;
+	public event EventHandler? OnSettingsSelected;
+	public event EventHandler? OnQuitSelected;
 
 	public override void RenderTitle()
 	{

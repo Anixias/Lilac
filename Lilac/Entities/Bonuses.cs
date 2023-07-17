@@ -1,4 +1,3 @@
-using System;
 using Lilac.Rendering;
 
 namespace Lilac.Entities;
@@ -29,7 +28,7 @@ public sealed class Bonuses
 	{
 		var positiveColor = StandardColor.DarkGreen;
 		var negativeColor = StandardColor.DarkRed;
-		
+
 		if (Strength != 0)
 		{
 			Screen.Write("Strength: ");
