@@ -1,15 +1,22 @@
 using System;
 using System.Collections.Generic;
-using Lilac.Dice;
 using Lilac.Combat;
+using Lilac.Dice;
+using Attribute = Lilac.Combat.Attribute;
 
 namespace Lilac.Components;
 
 public sealed class CombatComponent : IComponent
 {
-	public BattleState battleState;
-	
+	public enum CriticalState : byte
+	{
+		Normal,
+		CriticalSuccess,
+		CriticalFailure
+	}
+
 	private readonly StatsComponent statsComponent;
+	public BattleState battleState;
 
 	public CombatComponent(StatsComponent statsComponent)
 	{
@@ -18,7 +25,7 @@ public sealed class CombatComponent : IComponent
 
 	/// <summary>The defense bonus to all physical damage.</summary>
 	public int Defense { get; set; }
-	
+
 	/// <summary>The resistance bonus to all magical damage.</summary>
 	public int Resistance { get; set; }
 
@@ -29,34 +36,44 @@ public sealed class CombatComponent : IComponent
 	public Dictionary<DamageType.Magical, int> Resistances { get; } = new();
 
 	/// <summary>
-	/// The affinity levels for specific magical damage types.
+	///     The affinity levels for specific magical damage types.
 	/// </summary>
 	public Dictionary<DamageType.Magical, int> Affinities { get; set; } = new();
 
-	/// <summary>Returns the final defense for the given <see cref="DamageType.Physical"/>.</summary>
+	public Roll Initiative
+	{
+		get
+		{
+			var initiativeBonus = 0;
+			foreach (var bonus in statsComponent.bonuses) initiativeBonus += bonus.Initiative;
+
+			return Roll.Die.D20 + ((statsComponent.Agility + statsComponent.Perception) / 4 + initiativeBonus);
+		}
+	}
+
+	public int Evasion => 10 + statsComponent.Agility / 2;
+
+	/// <summary>Returns the final defense for the given <see cref="DamageType.Physical" />.</summary>
 	public int GetDefense(DamageType.Physical damageType)
 	{
 		var defenseBonus = 0;
-		foreach (var bonus in statsComponent.bonuses)
-		{
-			defenseBonus += bonus.Defense;
-		}
-		
+		foreach (var bonus in statsComponent.bonuses) defenseBonus += bonus.Defense;
+
 		return defenseBonus + Defense + (Defenses.TryGetValue(damageType, out var defense) ? defense : 0);
 	}
 
-	/// <summary>Returns the final resistance for the given <see cref="DamageType.Magical"/>.</summary>
+	/// <summary>Returns the final resistance for the given <see cref="DamageType.Magical" />.</summary>
 	public int GetResistance(DamageType.Magical damageType)
 	{
 		var affinityBonus = 0;
 
 		if (Affinities.TryGetValue(damageType, out var affinity) && affinity > 0)
 			affinityBonus += affinity * 2;
-		
+
 		return affinityBonus + Resistance + (Resistances.TryGetValue(damageType, out var resistance) ? resistance : 0);
 	}
 
-	/// <summary>Returns the final defense/resistance for the given <see cref="DamageType"/>.</summary>
+	/// <summary>Returns the final defense/resistance for the given <see cref="DamageType" />.</summary>
 	public int GetArmor(DamageType damageType)
 	{
 		switch (damageType)
@@ -69,21 +86,6 @@ public sealed class CombatComponent : IComponent
 				return 0;
 		}
 	}
-	
-	public Roll Initiative
-	{
-		get
-		{
-			var initiativeBonus = 0;
-			foreach (var bonus in statsComponent.bonuses)
-			{
-				initiativeBonus += bonus.Initiative;
-			}
-			
-			return Roll.Die.D20 + ((statsComponent.Agility + statsComponent.Perception) / 4 + initiativeBonus);
-		}
-	}
-	public int Evasion => 10 + statsComponent.Agility / 2;
 
 	public AttackResult RollAttack(CombatComponent? target)
 	{
@@ -92,9 +94,9 @@ public sealed class CombatComponent : IComponent
 
 		if (Game.Singleton?.CurrentDifficulty == Game.Difficulty.Easy)
 			advantage++;
-		
+
 		var rollCount = (uint)(Math.Abs(advantage) + 1);
-		
+
 		Roll baseRoll = advantage switch
 		{
 			> 0 => new Roll.KeepHighest(rollCount, 1, baseDie),
@@ -113,7 +115,8 @@ public sealed class CombatComponent : IComponent
 			if (Affinities.TryGetValue(damageType, out var affinity) && affinity > 0)
 				criticalChanceBonus += affinity;
 
-			if (target is not null && target.Affinities.TryGetValue(damageType, out var targetAffinity) && targetAffinity < 0)
+			if (target is not null && target.Affinities.TryGetValue(damageType, out var targetAffinity) &&
+				targetAffinity < 0)
 				criticalChanceBonus -= targetAffinity;
 		}
 
@@ -123,19 +126,19 @@ public sealed class CombatComponent : IComponent
 		return new AttackResult(attackRollResult.Value, criticalState);
 	}
 
-	public CheckResult RollCheck(StatsComponent.Attribute attribute, int bonus = 0, int advantage = 0)
+	public CheckResult RollCheck(Attribute attribute, int bonus = 0, int advantage = 0)
 	{
 		var baseDie = Roll.Die.D20;
 
 		var rollCount = (uint)(Math.Abs(advantage) + 1);
-		
+
 		Roll baseRoll = advantage switch
 		{
 			> 0 => new Roll.KeepHighest(rollCount, 1, baseDie),
 			< 0 => new Roll.KeepLowest(rollCount, 1, baseDie),
 			_   => baseDie
 		};
-		
+
 		var checkRoll = baseRoll + statsComponent.GetAttribute(attribute) / 2 + bonus;
 		var checkRollResult = checkRoll.Execute();
 
@@ -158,7 +161,7 @@ public sealed class CombatComponent : IComponent
 			var maximum = battleState.DamageRoll.BaseRange().Item2;
 			damage += maximum.Value * (1 + battleState.CriticalDamageBonus);
 		}
-		
+
 		return damage;
 	}
 
@@ -181,26 +184,22 @@ public sealed class CombatComponent : IComponent
 		return source with { Damage = newDamage };
 	}
 
-	public int GetInitiative() => battleState.Initiative;
+	public int GetInitiative()
+	{
+		return battleState.Initiative;
+	}
 
 	public struct BattleState
 	{
 		public Roll? DamageRoll { get; set; }
 		public DamageType? DamageType { get; set; }
-		public StatsComponent.Attribute AttackAttribute { get; set; }
+		public Attribute AttackAttribute { get; set; }
 		public int HitBonus { get; set; }
 		public int Initiative { get; set; }
 		public bool Hidden { get; set; }
 		public int AttackAdvantage { get; set; }
 		public int CriticalChanceBonus { get; set; }
 		public int CriticalDamageBonus { get; set; }
-	}
-	
-	public enum CriticalState : byte
-	{
-		Normal,
-		CriticalSuccess,
-		CriticalFailure
 	}
 
 	public readonly struct AttackResult
@@ -210,7 +209,7 @@ public sealed class CombatComponent : IComponent
 			AttackValue = attackValue;
 			CriticalState = criticalState;
 		}
-		
+
 		public int AttackValue { get; }
 		public CriticalState CriticalState { get; }
 
@@ -224,7 +223,7 @@ public sealed class CombatComponent : IComponent
 			CheckValue = checkValue;
 			CriticalState = criticalState;
 		}
-		
+
 		public int CheckValue { get; }
 		public CriticalState CriticalState { get; }
 	}
