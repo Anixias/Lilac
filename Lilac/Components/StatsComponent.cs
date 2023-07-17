@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Lilac.Entities;
 
@@ -5,6 +6,8 @@ namespace Lilac.Components;
 
 public sealed class StatsComponent : IComponent
 {
+	public delegate void EventHandler();
+
 	public enum Attribute : byte
 	{
 		Strength,
@@ -14,46 +17,31 @@ public sealed class StatsComponent : IComponent
 		Perception,
 		Charisma
 	}
-	
-	public delegate void EventHandler();
-	public event EventHandler? OnStatsChanged;
-	
-	private readonly HealthComponent? healthComponent;
-	private readonly ManaComponent? manaComponent;
-	private readonly LevelComponent? levelComponent;
+
 	public readonly List<Bonuses> bonuses = new();
 
-	private int strength;
+	private readonly HealthComponent? healthComponent;
+	private readonly LevelComponent? levelComponent;
+	private readonly ManaComponent? manaComponent;
 	private int agility;
-	private int intelligence;
-	private int constitution;
-	private int perception;
 	private int charisma;
+	private int constitution;
+	private int intelligence;
+	private int perception;
 
-	public StatsComponent(HealthComponent? healthComponent, ManaComponent? manaComponent, LevelComponent? levelComponent)
+	private int strength;
+
+	public StatsComponent(HealthComponent? healthComponent, ManaComponent? manaComponent,
+						  LevelComponent? levelComponent)
 	{
 		this.healthComponent = healthComponent;
 		this.manaComponent = manaComponent;
 		this.levelComponent = levelComponent;
 
 		if (this.levelComponent is not null)
-			this.levelComponent.OnLevelChanged += (_) => Refresh();
+			this.levelComponent.OnLevelChanged += _ => Refresh();
 	}
 
-	public int GetAttribute(Attribute attribute)
-	{
-		return attribute switch
-		{
-			Attribute.Strength => Strength,
-			Attribute.Agility => Agility,
-			Attribute.Intelligence => Intelligence,
-			Attribute.Constitution => Constitution,
-			Attribute.Perception => Perception,
-			Attribute.Charisma => Charisma,
-			_ => throw new System.Exception("Invalid attribute.")
-		};
-	}
-	
 	public int Strength
 	{
 		get => strength;
@@ -61,13 +49,13 @@ public sealed class StatsComponent : IComponent
 		{
 			if (strength == value)
 				return;
-			
+
 			strength = value;
 			Refresh();
 			OnStatsChanged?.Invoke();
 		}
 	}
-	
+
 	public int Agility
 	{
 		get => agility;
@@ -75,13 +63,13 @@ public sealed class StatsComponent : IComponent
 		{
 			if (agility == value)
 				return;
-			
+
 			agility = value;
 			Refresh();
 			OnStatsChanged?.Invoke();
 		}
 	}
-	
+
 	public int Intelligence
 	{
 		get => intelligence;
@@ -89,13 +77,13 @@ public sealed class StatsComponent : IComponent
 		{
 			if (intelligence == value)
 				return;
-			
+
 			intelligence = value;
 			Refresh();
 			OnStatsChanged?.Invoke();
 		}
 	}
-	
+
 	public int Constitution
 	{
 		get => constitution;
@@ -103,13 +91,13 @@ public sealed class StatsComponent : IComponent
 		{
 			if (constitution == value)
 				return;
-			
+
 			constitution = value;
 			Refresh();
 			OnStatsChanged?.Invoke();
 		}
 	}
-	
+
 	public int Perception
 	{
 		get => perception;
@@ -117,13 +105,13 @@ public sealed class StatsComponent : IComponent
 		{
 			if (perception == value)
 				return;
-			
+
 			perception = value;
 			Refresh();
 			OnStatsChanged?.Invoke();
 		}
 	}
-	
+
 	public int Charisma
 	{
 		get => charisma;
@@ -131,11 +119,27 @@ public sealed class StatsComponent : IComponent
 		{
 			if (charisma == value)
 				return;
-			
+
 			charisma = value;
 			Refresh();
 			OnStatsChanged?.Invoke();
 		}
+	}
+
+	public event EventHandler? OnStatsChanged;
+
+	public int GetAttribute(Attribute attribute)
+	{
+		return attribute switch
+		{
+			Attribute.Strength     => Strength,
+			Attribute.Agility      => Agility,
+			Attribute.Intelligence => Intelligence,
+			Attribute.Constitution => Constitution,
+			Attribute.Perception   => Perception,
+			Attribute.Charisma     => Charisma,
+			_                      => throw new Exception("Invalid attribute.")
+		};
 	}
 
 	private void Refresh()
@@ -150,7 +154,7 @@ public sealed class StatsComponent : IComponent
 			healthBonus += bonus.Health;
 			manaBonus += bonus.Mana;
 		}
-		
+
 		if (healthComponent is not null)
 			healthComponent.MaxHealth = healthBonus + 2 * Constitution + (level - 1) * Constitution;
 

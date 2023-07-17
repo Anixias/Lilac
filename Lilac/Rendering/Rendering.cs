@@ -12,12 +12,12 @@ public static class Drawing
 		Screen.BackgroundColor = color;
 		if (filled > 0)
 			Screen.Write(new string(' ', filled));
-		
+
 		Screen.ResetColor();
 
 		if (width - filled > 0)
 			Screen.Write(new string(' ', width - filled));
-		
+
 		Screen.Write("]");
 	}
 }

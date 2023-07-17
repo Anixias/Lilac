@@ -5,8 +5,11 @@ namespace Lilac.Menus;
 
 public sealed class Option
 {
+	public Action? selected;
+	public Action<int>? valueChanged;
+
 	public Option(string label)
-	: this(label, Array.Empty<string>())
+		: this(label, Array.Empty<string>())
 	{
 	}
 
@@ -21,16 +24,13 @@ public sealed class Option
 	public string Label { get; }
 	public bool Cycle { get; init; } = false;
 
-	public Action? selected;
-	public Action<int>? valueChanged;
-
 	public void Display(bool hovered)
 	{
 		Screen.ForegroundColor = hovered ? StandardColor.Green : StandardColor.White;
-		
+
 		Screen.Write($"{(hovered ? "> " : "  ")}");
 		Screen.Write(Label);
-		
+
 		if (Values.Length > 0)
 		{
 			var prevArrow = SelectedValue > 0 || Cycle ? "<- " : "   ";
@@ -44,7 +44,7 @@ public sealed class Option
 
 	public void SelectPrevious()
 	{
-		if ((SelectedValue <= 0) && !Cycle)
+		if (SelectedValue <= 0 && !Cycle)
 			return;
 
 		SelectedValue--;
@@ -56,7 +56,7 @@ public sealed class Option
 
 	public void SelectNext()
 	{
-		if ((SelectedValue >= Values.Length - 1) && !Cycle)
+		if (SelectedValue >= Values.Length - 1 && !Cycle)
 			return;
 
 		SelectedValue++;

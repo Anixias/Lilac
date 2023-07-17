@@ -1,6 +1,7 @@
+using System;
+using Lilac.Combat;
 using Lilac.Components;
 using Lilac.Components.Controllers;
-using Lilac.Combat;
 using Lilac.Dice;
 
 namespace Lilac.Entities.Creatures;
@@ -11,8 +12,8 @@ public sealed class Player : Creature
 	{
 		Name = character.Name;
 		AddComponent(new UserController(this));
-		AddComponent(new CharacterComponent(character, GetComponent<StatsComponent>() ?? 
-													   throw new System.Exception("Player requires a StatsComponent.")));
+		AddComponent(new CharacterComponent(character, GetComponent<StatsComponent>() ??
+													   throw new Exception("Player requires a StatsComponent.")));
 
 		JoinAllegiance(Allegiance.Player);
 
@@ -25,8 +26,8 @@ public sealed class Player : Creature
 		combatComponent.battleState.DamageRoll = Roll.Die.D6;
 	}
 
-	public Character Character => GetComponent<CharacterComponent>()?.Character ?? 
-								  throw new System.Exception("Missing Character for Player.");
+	public Character Character => GetComponent<CharacterComponent>()?.Character ??
+								  throw new Exception("Missing Character for Player.");
 
 	public override void Render()
 	{

@@ -1,12 +1,9 @@
-using System;
 using Lilac.Rendering;
 
 namespace Lilac.Menus;
 
 public sealed class PreIntroMenu : Menu
 {
-	public event EventHandler? OnOkaySelected;
-	
 	public PreIntroMenu()
 	{
 		Options = new[]
@@ -17,10 +14,12 @@ public sealed class PreIntroMenu : Menu
 			}
 		};
 	}
-	
-    public override void RenderTitle()
-    {
-        Screen.ForegroundColor = StandardColor.Blue;
+
+	public event EventHandler? OnOkaySelected;
+
+	public override void RenderTitle()
+	{
+		Screen.ForegroundColor = StandardColor.Blue;
 
 		Screen.Write("# =========== ");
 		Screen.ForegroundColor = StandardColor.Cyan;
@@ -31,5 +30,5 @@ public sealed class PreIntroMenu : Menu
 		Screen.ResetColor();
 
 		Screen.WriteLine("You may press ESC at any time to view the pause menu.");
-    }
+	}
 }

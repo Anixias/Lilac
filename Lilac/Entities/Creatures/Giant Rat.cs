@@ -1,6 +1,6 @@
+using Lilac.Combat;
 using Lilac.Components;
 using Lilac.Components.Controllers;
-using Lilac.Combat;
 using Lilac.Dice;
 
 namespace Lilac.Entities.Creatures;

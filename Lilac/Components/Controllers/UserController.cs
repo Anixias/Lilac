@@ -14,14 +14,13 @@ public sealed class UserController : IController
 	}
 
 	public bool IsUser => true;
-	
+
 	public void BeginBattle(Battle battle)
 	{
 		this.battle = battle;
 	}
-	
+
 	public void TakeTurn()
 	{
-		
 	}
 }

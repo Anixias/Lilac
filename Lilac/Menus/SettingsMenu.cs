@@ -1,14 +1,10 @@
-using System;
 using Lilac.Rendering;
 
 namespace Lilac.Menus;
 
 public sealed class SettingsMenu : Menu
 {
-	public event EventHandler? OnBackSelected;
-
 	public delegate void DifficultyChangedEventHandler(Game.Difficulty difficulty);
-	public event DifficultyChangedEventHandler? OnDifficultyChanged;
 
 	public SettingsMenu()
 	{
@@ -16,20 +12,17 @@ public sealed class SettingsMenu : Menu
 		{
 			new Option("Difficulty", "Easy", "Normal", "Hard")
 			{
-				valueChanged = index =>
-				{
-					OnDifficultyChanged?.Invoke((Game.Difficulty)index);
-				}
+				valueChanged = index => { OnDifficultyChanged?.Invoke((Game.Difficulty)index); }
 			},
 			new Option("Back")
 			{
-				selected = () =>
-				{
-					OnBackSelected?.Invoke();
-				}
+				selected = () => { OnBackSelected?.Invoke(); }
 			}
 		};
 	}
+
+	public event EventHandler? OnBackSelected;
+	public event DifficultyChangedEventHandler? OnDifficultyChanged;
 
 	public override void RenderTitle()
 	{

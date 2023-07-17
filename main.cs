@@ -1,4 +1,3 @@
-using System;
 using Lilac;
 using Lilac.Rendering;
 
@@ -10,7 +9,7 @@ internal static class Program
 		Screen.SwapActiveBuffer();
 		Screen.CursorVisible = false;
 		Screen.Clear();
-		
+
 		try
 		{
 			var game = new Game();
