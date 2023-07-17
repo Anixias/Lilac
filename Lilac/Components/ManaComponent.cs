@@ -9,7 +9,6 @@ public sealed class ManaComponent : IComponent
 
 	public ManaComponent()
 	{
-		
 	}
 
 	public ManaComponent(int maxMana)
@@ -17,13 +16,13 @@ public sealed class ManaComponent : IComponent
 		MaxMana = maxMana;
 		Mana = maxMana;
 	}
-	
+
 	public int Mana
 	{
 		get => mana;
 		set => mana = Math.Clamp(value, 0, MaxMana);
 	}
-	
+
 	public int MaxMana
 	{
 		get => maxMana;

@@ -1,14 +1,9 @@
-using System;
 using Lilac.Rendering;
 
 namespace Lilac.Menus;
 
 public sealed class PauseMenu : Menu
 {
-	public event EventHandler? OnResumeSelected;
-	public event EventHandler? OnQuitToMainMenuSelected;
-	public event EventHandler? OnQuitToDesktopSelected;
-	
 	public PauseMenu()
 	{
 		Options = new[]
@@ -27,10 +22,14 @@ public sealed class PauseMenu : Menu
 			}
 		};
 	}
-	
-    public override void RenderTitle()
-    {
-        Screen.ForegroundColor = StandardColor.DarkGray;
+
+	public event EventHandler? OnResumeSelected;
+	public event EventHandler? OnQuitToMainMenuSelected;
+	public event EventHandler? OnQuitToDesktopSelected;
+
+	public override void RenderTitle()
+	{
+		Screen.ForegroundColor = StandardColor.DarkGray;
 
 		Screen.Write("# =========== ");
 		Screen.ForegroundColor = StandardColor.Yellow;
@@ -39,5 +38,5 @@ public sealed class PauseMenu : Menu
 		Screen.WriteLine(" =========== #");
 
 		Screen.ResetColor();
-    }
+	}
 }

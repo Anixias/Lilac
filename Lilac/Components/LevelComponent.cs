@@ -4,12 +4,11 @@ namespace Lilac.Components;
 
 public sealed class LevelComponent : IComponent
 {
+	public delegate void LevelEventHandler(int level);
+
 	private const int XPThreshold = 100;
 	private const int XPThresholdGrowthRate = 100;
 	private int xp;
-
-	public delegate void LevelEventHandler(int level);
-	public event LevelEventHandler? OnLevelChanged;
 
 	public LevelComponent()
 	{
@@ -17,6 +16,7 @@ public sealed class LevelComponent : IComponent
 	}
 
 	public int Level { get; private set; }
+
 	public int XP
 	{
 		get => xp;
@@ -31,6 +31,8 @@ public sealed class LevelComponent : IComponent
 				OnLevelChanged?.Invoke(Level);
 		}
 	}
+
+	public event LevelEventHandler? OnLevelChanged;
 
 	public static int GetLevelFromXP(int xp)
 	{
@@ -49,15 +51,9 @@ public sealed class LevelComponent : IComponent
 
 	public static int GetXPFromLevel(int level)
 	{
-		if (level < 1)
-		{
-			throw new ArgumentException("Level must be positive");
-		}
-	
-		if (level == 1)
-		{
-			return 0;
-		}
+		if (level < 1) throw new ArgumentException("Level must be positive");
+
+		if (level == 1) return 0;
 
 		var threshold = XPThreshold;
 		var xp = 0;
@@ -67,7 +63,7 @@ public sealed class LevelComponent : IComponent
 			xp += threshold;
 			threshold += XPThresholdGrowthRate;
 		}
-		
+
 		return xp;
 	}
 }

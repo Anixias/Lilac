@@ -8,6 +8,5 @@ public sealed class World
 
 	public void Generate()
 	{
-		
 	}
 }

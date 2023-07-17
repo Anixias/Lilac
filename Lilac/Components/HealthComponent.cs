@@ -9,7 +9,6 @@ public sealed class HealthComponent : IComponent
 
 	public HealthComponent()
 	{
-		
 	}
 
 	public HealthComponent(int maxHealth)
@@ -17,13 +16,13 @@ public sealed class HealthComponent : IComponent
 		MaxHealth = maxHealth;
 		Health = maxHealth;
 	}
-	
+
 	public int Health
 	{
 		get => health;
 		set => health = Math.Clamp(value, 0, MaxHealth);
 	}
-	
+
 	public int MaxHealth
 	{
 		get => maxHealth;

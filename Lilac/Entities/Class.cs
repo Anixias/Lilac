@@ -2,15 +2,6 @@ namespace Lilac.Entities;
 
 public sealed class Class
 {
-	public string DisplayName { get; }
-	public string Description { get; private init; } = "";
-	public Bonuses? Bonuses { get; private init; }
-	
-	private Class(string displayName)
-	{
-		DisplayName = displayName;
-	}
-
 	public static readonly Class Warrior = new("Warrior")
 	{
 		Description = "A mighty agent of war, capable of withstanding heavy blows and dishing out massive damage.",
@@ -46,4 +37,13 @@ public sealed class Class
 			Mana = +5
 		}
 	};
+
+	private Class(string displayName)
+	{
+		DisplayName = displayName;
+	}
+
+	public string DisplayName { get; }
+	public string Description { get; private init; } = "";
+	public Bonuses? Bonuses { get; private init; }
 }
