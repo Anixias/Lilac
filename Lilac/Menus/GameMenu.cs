@@ -19,19 +19,6 @@ public sealed class GameMenu : MenuContainer
 			() => { showControls = !showControls; });
 
 		customKeyEvents.Add(new ConsoleKeyInfo('p', ConsoleKey.P, false, true, false), ShowPartyInformation);
-
-		var battle = new Battle();
-		if (Game.Singleton is { } game)
-			foreach (var partyMember in game.Party)
-				battle.AddBattleMember(partyMember);
-
-		battle.AddBattleMember(new GiantRat { Name = "Giant Rat 1" });
-		battle.AddBattleMember(new GiantRat { Name = "Giant Rat 2" });
-		battle.AddBattleMember(new GiantRat { Name = "Giant Rat 3" });
-
-		battle.Begin();
-		var battleMenu = new BattleMenu(battle);
-		CurrentMenu = battleMenu;
 	}
 
 	private void ShowPartyInformation()
