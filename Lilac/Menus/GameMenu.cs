@@ -23,20 +23,20 @@ public sealed class GameMenu : MenuContainer
 
 	private void ShowPartyInformation()
 	{
-		if (currentMenu is CharacterInformationMenu)
+		if (CurrentMenu is CharacterInformationMenu)
 			return;
 
-		var previousMenu = currentMenu;
+		var previousMenu = CurrentMenu;
 
 		var characterInformationMenu = new CharacterInformationMenu();
-		characterInformationMenu.OnContinueSelected += () => { currentMenu = previousMenu; };
+		characterInformationMenu.OnContinueSelected += () => { CurrentMenu = previousMenu; };
 
-		currentMenu = characterInformationMenu;
+		CurrentMenu = characterInformationMenu;
 	}
 
 	protected override void RenderContainerTitle()
 	{
-		if (currentMenu is CharacterInformationMenu)
+		if (CurrentMenu is CharacterInformationMenu)
 			return;
 
 		var player = Game.Singleton?.Player;

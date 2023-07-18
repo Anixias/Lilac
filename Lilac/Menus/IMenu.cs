@@ -9,12 +9,24 @@ public interface IMenu
 	void RenderTitle();
 	void RenderOptions();
 	bool HandleKey(ConsoleKeyInfo key);
+	void Activated();
+	void Deactivated();
 }
 
 public abstract class MenuContainer : IMenu
 {
 	protected readonly Dictionary<ConsoleKeyInfo, Action> customKeyEvents = new();
-	protected IMenu? currentMenu;
+	private IMenu? currentMenu;
+	protected IMenu? CurrentMenu
+	{
+		get => currentMenu;
+		set
+		{
+			currentMenu?.Deactivated();
+			currentMenu = value;
+			currentMenu?.Activated();
+		}
+	}
 
 	public void RenderTitle()
 	{
@@ -39,6 +51,9 @@ public abstract class MenuContainer : IMenu
 	}
 
 	protected abstract void RenderContainerTitle();
+
+	public virtual void Activated() {}
+	public virtual void Deactivated() {}
 }
 
 public abstract class Prompt : IMenu
@@ -83,9 +98,22 @@ public abstract class Prompt : IMenu
 	{
 		Input = input;
 	}
+
+	public virtual void Activated() {}
+	public virtual void Deactivated() {}
 }
 
-public abstract class Menu : IMenu
+public interface ISelectionMenu : IMenu
+{
+	delegate void EventHandler();
+}
+
+public interface IReturnableMenu : ISelectionMenu
+{
+	event EventHandler? OnBackSelected;
+}
+
+public abstract class Menu : ISelectionMenu
 {
 	public delegate void EventHandler();
 
@@ -146,4 +174,11 @@ public abstract class Menu : IMenu
 
 		return true;
 	}
+
+	public virtual void Activated()
+	{
+		hoverIndex = 0;
+	}
+	
+	public virtual void Deactivated() {}
 }
