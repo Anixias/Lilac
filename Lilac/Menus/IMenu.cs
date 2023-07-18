@@ -175,6 +175,10 @@ public abstract class Menu : ISelectionMenu
 		return true;
 	}
 
-	public virtual void Activated() {}
+	public virtual void Activated()
+	{
+		hoverIndex = 0;
+	}
+	
 	public virtual void Deactivated() {}
 }
