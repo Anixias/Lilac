@@ -15,7 +15,7 @@ public sealed class Graph
 	public Graph(int nodeCount, int extraEdgeCount)
 	{
 		// Apply minimum/maximum Edge Count
-		ExtraEdgeCount = Math.Min(Math.Max(extraEdgeCount, 0), nodeCount * (nodeCount - 1) / 2 - (nodeCount - 1));
+		ExtraEdgeCount = Math.Clamp(extraEdgeCount, 0, nodeCount * (nodeCount - 1) / 2 - (nodeCount - 1));
 
 		// Generate Nodes
 		var random = new Random();
