@@ -1,10 +1,12 @@
 using Lilac;
 using Lilac.Rendering;
+using Lilac.Generation;
 
 internal static class Program
 {
 	public static void Main(string[] args)
 	{
+/*
 		// Setup The Console
 		Screen.SwapActiveBuffer();
 		Screen.CursorVisible = false;
@@ -22,5 +24,8 @@ internal static class Program
 			Screen.CursorVisible = true;
 			Screen.SwapActiveBuffer();
 		}
+*/
+		// var graph = new Graph();
+		Graph graph = new Graph(25, 20);
 	}
 }
