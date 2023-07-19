@@ -1,184 +1,211 @@
 using System;
-using System.Linq;
 using System.Collections.Generic;
-using System.Numerics;
-using Lilac.Rendering;
-using System.IO;
 using System.Diagnostics;
+using System.IO;
+using System.Linq;
+using System.Numerics;
 
 namespace Lilac.Generation;
 
-
-
-
 public sealed class Graph
 {
-    public int ExtraEdgeCount { get; private init; }
-    private List<Node> Nodes;
-    private List<Edge> Edges;
+	private readonly List<Edge> edges = new();
+	private readonly List<Node> nodes = new();
 
-    public Graph(int nodeCount, int extraEdgeCount)
-    {
-        ExtraEdgeCount = Math.Min(Math.Max(extraEdgeCount, 0), ((nodeCount*(nodeCount-1))/2) - (nodeCount-1));  // apply minimum/maximum edgecount
+	public Graph(int nodeCount, int extraEdgeCount)
+	{
+		// Apply minimum/maximum Edge Count
+		ExtraEdgeCount = Math.Min(Math.Max(extraEdgeCount, 0), nodeCount * (nodeCount - 1) / 2 - (nodeCount - 1));
 
-        Random rnd = new Random();
+		// Generate Nodes
+		var random = new Random();
+		for (var i = 0; i < nodeCount; i++)
+			nodes.Add(new Node(random.NextSingle(), random.NextSingle()));
 
-        // generate Nodes
-        Nodes = new List<Node>();
-        for (int i=0; i<nodeCount; i++)
-            Nodes.Add(new Node(rnd.NextSingle(), rnd.NextSingle()));
+		// Generate all possible edges
+		var possibleEdges = new List<Edge>();
 
-        // generate all possible edges
-        List<Edge> PossibleEdges = new List<Edge>();
-        for (int i=1; i<Nodes.Count(); i++)
-            for (int j=0; j<i; j++)
-                PossibleEdges.Add(new Edge(
-                    Nodes[i],
-                    Nodes[j]
-                ));
-        PossibleEdges = PossibleEdges.OrderBy(e => e.Length()).ToList();
+		for (var i = 1; i < nodes.Count; i++)
+			for (var j = 0; j < i; j++)
+				possibleEdges.Add(new Edge(nodes[i], nodes[j]));
 
-        // build MST (Minimum Spanning Tree)
-        Edges = new List<Edge>();
-        Edge edge;
-        for (int idx=0; Edges.Count()+1<Nodes.Count();)
-        {
-            edge = PossibleEdges[idx];
-            Edges.Add(edge);
-            if (!isTree(edge.nodeA))
-            {
-                Edges.Remove(edge);
-                idx++;
-            } else
-                PossibleEdges.Remove(edge);
-        }
+		possibleEdges = possibleEdges.OrderBy(e => e.Length()).ToList();
 
-        // add additional edges
-        Node node;
-        // List<Edge> randomNodeEdges = new List<Edge>();
-        while (Edges.Count()+1 < Nodes.Count() + ExtraEdgeCount)
-        {
-            node = Nodes[rnd.Next(Nodes.Count())];
-            // randomNodeEdges.Clear();
-            foreach (Edge e in PossibleEdges)
-                if (object.Equals(e.nodeA, node) || object.Equals(e.nodeB, node))
-                    if (!Edges.Contains(e))
-                    {
-                        Edges.Add(e);
-                        break;
-                    }
-        }
+		// Build MST (Minimum Spanning Tree)
+		for (var idx = 0; edges.Count + 1 < nodes.Count;)
+		{
+			var edge = possibleEdges[idx];
+			edges.Add(edge);
+			if (!IsTree(edge.nodeA))
+			{
+				edges.Remove(edge);
+				idx++;
+			}
+			else
+			{
+				possibleEdges.Remove(edge);
+			}
+		}
 
-        render("net", false);
-    }
+		// Add additional edges
+		while (edges.Count + 1 < nodes.Count + ExtraEdgeCount)
+		{
+			var node = nodes[random.Next(nodes.Count)];
+			foreach (var e in possibleEdges)
+				if (e.nodeA == node || e.nodeB == node)
+					if (!edges.Contains(e))
+					{
+						edges.Add(e);
+						break;
+					}
+		}
 
-    // todo: if this fuction doesnt end up getting used anywhere else, integrate it into the MST algorithm
-    bool isTree(Node node)
-    {
-        List<Node> seen = new List<Node>();
-        Queue<Node> queue = new Queue<Node>();
-        List<Node> connectedNodes;
-        Node currentNode;
-        bool common;
+		Render("net", false);
+	}
 
-        queue.Enqueue(node);
-        while (queue.Any())
-        {
-            currentNode = queue.Dequeue();
-            seen.Add(currentNode);
-            // get all connected nodes
-            common = false;
+	private int ExtraEdgeCount { get; }
 
-            connectedNodes = GetConnectedNodes(currentNode);
-            foreach(Node n in connectedNodes)
-            {
-                if (seen.Contains(n))
-                    if (common)
-                        return false;
-                    else
-                        common = true;
-                else
-                    queue.Enqueue(n);
-            }
-        }
+	// todo: If this function doesn't end up getting used anywhere else, integrate it into the MST algorithm
+	private bool IsTree(Node node)
+	{
+		var seen = new List<Node>();
+		var queue = new Queue<Node>();
 
-        return true;
-    }
+		queue.Enqueue(node);
+		while (queue.Any())
+		{
+			var currentNode = queue.Dequeue();
+			seen.Add(currentNode);
 
-    // todo: same as above
-    public List<Node> GetConnectedNodes(Node node)
-    {
-        List<Node> nodes = new List<Node>();
-        foreach (Edge edge in Edges)
-        {
-            if (object.Equals(edge.nodeA, node))
-                nodes.Add(edge.nodeB);
-            if (object.Equals(edge.nodeB, node))
-                nodes.Add(edge.nodeA);
-        }
-        return nodes;
-    }
+			// Get all connected nodes
+			var common = false;
 
-    // debug
-    public void render(string filename, bool positional = true)
-    {
-        FileStream fp = File.Open(filename + ".dot", FileMode.Create);
-        StreamWriter writetext = new StreamWriter(fp);
-        writetext.WriteLine($"graph {filename}{{");
-        Node node;
-        for (int i=0; i<Nodes.Count(); i++)
-        {
-            node = Nodes[i];
-            writetext.WriteLine($"    {i} [label=\"Node {i}\\n{Math.Round(node.pos.X,2)} {Math.Round(node.pos.Y,2)}\" pos=\"{node.pos.X},{node.pos.Y}{(positional ? "!" : "")}\"]");
-        }
-        foreach (Edge edge in Edges)
-        {
-            writetext.WriteLine($"    {Nodes.IndexOf(edge.nodeA)} -- {Nodes.IndexOf(edge.nodeB)} [label=\"{Edges.IndexOf(edge)}\"]");
-        }
-        writetext.WriteLine("}");
+			var connectedNodes = GetConnectedNodes(currentNode);
+			foreach (var n in connectedNodes)
+				if (seen.Contains(n))
+				{
+					if (common)
+						return false;
 
-        // requires graphviz to be installed
-        Process.Start("fdp", $"-Tpng {filename}.dot -o {filename}.png");
-        Process.Start("fdp", $"-Tsvg {filename}.dot -o {filename}.svg");
+					common = true;
+				}
+				else
+				{
+					queue.Enqueue(n);
+				}
+		}
 
-        writetext.Close();
-    }
+		return true;
+	}
+
+	// todo: Same as above
+	private List<Node> GetConnectedNodes(Node node)
+	{
+		var connectedNodes = new List<Node>();
+		foreach (var edge in edges)
+		{
+			if (edge.nodeA == node)
+				connectedNodes.Add(edge.nodeB);
+
+			if (edge.nodeB == node)
+				connectedNodes.Add(edge.nodeA);
+		}
+
+		return connectedNodes;
+	}
+
+	// debug
+	private void Render(string filename, bool isPositional = true)
+	{
+		var fileStream = File.Open($"{filename}.dot", FileMode.Create);
+		var streamWriter = new StreamWriter(fileStream);
+		streamWriter.WriteLine($"graph {filename}{{");
+
+		for (var i = 0; i < nodes.Count; i++)
+		{
+			var node = nodes[i];
+			var nodeLabel = $"Node {i}\\n{Math.Round(node.position.X, 2)} {Math.Round(node.position.Y, 2)}";
+			var nodePosition = $"{node.position.X},{node.position.Y}{(isPositional ? "!" : "")}";
+			var nodeLine = $"    {i} [label=\"{nodeLabel}\" pos=\"{nodePosition}\"]";
+			streamWriter.WriteLine(nodeLine);
+		}
+
+		foreach (var edge in edges)
+		{
+			var nodeAIndex = nodes.IndexOf(edge.nodeA);
+			var nodeBIndex = nodes.IndexOf(edge.nodeB);
+			var edgeIndex = edges.IndexOf(edge);
+			var edgeLine = $"    {nodeAIndex} -- {nodeBIndex} [label=\"{edgeIndex}\"]";
+			streamWriter.WriteLine(edgeLine);
+		}
+
+		streamWriter.WriteLine("}");
+
+		// Requires graphviz to be installed
+		Process.Start("fdp", $"-Tpng {filename}.dot -o {filename}.png");
+		Process.Start("fdp", $"-Tsvg {filename}.dot -o {filename}.svg");
+
+		streamWriter.Close();
+	}
 }
 
-
-
-
-
-
-public readonly struct Node
+public readonly struct Node : IEquatable<Node>
 {
-    public readonly Vector2 pos;
+	public readonly Vector2 position;
 
-    public Node(float x, float y)
-    {
-        this.pos = new Vector2(x, y);
-    }
+	public Node(float x, float y)
+	{
+		position = new Vector2(x, y);
+	}
 
-    public Node(Vector2 pos)
-    {
-        this.pos = pos;
-    }
+	public Node(Vector2 position)
+	{
+		this.position = position;
+	}
+
+	public static bool operator ==(Node left, Node right)
+	{
+		return left.Equals(right);
+	}
+
+	public static bool operator !=(Node left, Node right)
+	{
+		return !(left == right);
+	}
+
+	#region IEquatable<Node> members
+
+	public bool Equals(Node other)
+	{
+		return position.Equals(other.position);
+	}
+
+	public override bool Equals(object? obj)
+	{
+		return obj is Node other && Equals(other);
+	}
+
+	public override int GetHashCode()
+	{
+		return position.GetHashCode();
+	}
+
+	#endregion
 }
 
 public readonly struct Edge
 {
-    public readonly Node nodeA;
-    public readonly Node nodeB;
+	public readonly Node nodeA;
+	public readonly Node nodeB;
 
-    public Edge(Node NodeA, Node NodeB)
-    {
-        this.nodeA = NodeA;
-        this.nodeB = NodeB;
-    }
+	public Edge(Node nodeA, Node nodeB)
+	{
+		this.nodeA = nodeA;
+		this.nodeB = nodeB;
+	}
 
-    public float Length()
-    {
-        return (nodeA.pos - nodeB.pos).Length();
-    }
+	public float Length()
+	{
+		return (nodeA.position - nodeB.position).Length();
+	}
 }
-
