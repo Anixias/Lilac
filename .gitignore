@@ -7,3 +7,8 @@ obj/
 
 # VSCode ignores
 .vscode/
+
+# graph debug ignores
+*.dot
+*.png
+*.svg
