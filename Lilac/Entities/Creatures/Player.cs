@@ -13,6 +13,9 @@ public sealed class Player : Creature
 	{
 		Name = character.Name;
 		AddComponent(new UserController(this));
+		var equipmentComponent = new EquipmentComponent();
+		AddComponent(equipmentComponent);
+		AddComponent(new InventoryComponent(equipmentComponent));
 		AddComponent(new CharacterComponent(character, GetComponent<StatsComponent>() ??
 													   throw new Exception("Player requires a StatsComponent.")));
 
@@ -22,9 +25,14 @@ public sealed class Player : Creature
 			return;
 
 		combatComponent.Affinities = character.Affinities;
-		combatComponent.battleState.AttackAttribute = Attribute.Strength;
-		combatComponent.battleState.DamageType = DamageType.Slashing;
-		combatComponent.battleState.DamageRoll = Roll.Die.D6;
+
+		equipmentComponent.OnEquipmentChanged += () =>
+		{
+			combatComponent.battleState.AttackAttribute =
+				equipmentComponent.Weapon?.AttackAttribute ?? Attribute.Strength;
+			combatComponent.battleState.DamageType = equipmentComponent.Weapon?.DamageType ?? DamageType.Crushing;
+			combatComponent.battleState.DamageRoll = equipmentComponent.Weapon?.DamageRoll ?? Roll.Die.D4;
+		};
 	}
 
 	public Character Character => GetComponent<CharacterComponent>()?.Character ??
