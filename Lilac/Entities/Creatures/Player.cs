@@ -20,19 +20,13 @@ public sealed class Player : Creature
 													   throw new Exception("Player requires a StatsComponent.")));
 
 		JoinAllegiance(Allegiance.Player);
+		UpdateCombatStats();
 
 		if (GetComponent<CombatComponent>() is not { } combatComponent)
 			return;
 
 		combatComponent.Affinities = character.Affinities;
-
-		equipmentComponent.OnEquipmentChanged += () =>
-		{
-			combatComponent.battleState.AttackAttribute =
-				equipmentComponent.Weapon?.AttackAttribute ?? Attribute.Strength;
-			combatComponent.battleState.DamageType = equipmentComponent.Weapon?.DamageType ?? DamageType.Crushing;
-			combatComponent.battleState.DamageRoll = equipmentComponent.Weapon?.DamageRoll ?? Roll.Die.D4;
-		};
+		equipmentComponent.OnEquipmentChanged += UpdateCombatStats;
 	}
 
 	public Character Character => GetComponent<CharacterComponent>()?.Character ??
@@ -44,5 +38,18 @@ public sealed class Player : Creature
 			return;
 
 		characterComponent.Character.Display();
+	}
+
+	private void UpdateCombatStats()
+	{
+		if (GetComponent<CombatComponent>() is not { } combatComponent)
+			return;
+
+		var equipmentComponent = GetComponent<EquipmentComponent>();
+
+		combatComponent.battleState.AttackAttribute =
+			equipmentComponent?.Weapon?.AttackAttribute ?? Attribute.Strength;
+		combatComponent.battleState.DamageType = equipmentComponent?.Weapon?.DamageType ?? DamageType.Crushing;
+		combatComponent.battleState.DamageRoll = equipmentComponent?.Weapon?.DamageRoll ?? Roll.Die.D4;
 	}
 }
