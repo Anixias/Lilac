@@ -37,11 +37,17 @@ public sealed class Weapon : IItem
 		DamageType = damageType;
 	}
 
-	public bool TwoHanded { get; init; }
-	public int HitBonus { get; init; }
+	public bool TwoHanded { get; private init; }
+	public int HitBonus { get; private init; }
 	public Roll DamageRoll { get; }
 	public Attribute AttackAttribute { get; }
 	public DamageType DamageType { get; }
+	public EquipmentSlot EquipmentSlot => EquipmentSlot.Weapon;
 	public string Name { get; }
 	public string Description { get; }
+
+	public WeaponInstance Instantiate(Material material)
+	{
+		return new WeaponInstance(this, material);
+	}
 }
