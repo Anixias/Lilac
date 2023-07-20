@@ -48,6 +48,12 @@ public sealed class Battle
 		}
 	}
 
+	public void AddParty(IEnumerable<IBattleMember> battleMembers)
+	{
+		foreach (var battleMember in battleMembers)
+			AddBattleMember(battleMember);
+	}
+
 	public void RemoveBattleMember(IBattleMember battleMember)
 	{
 		var battleMemberTurn = battleMembers.FindIndex(m => ReferenceEquals(m, battleMember));

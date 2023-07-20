@@ -23,8 +23,7 @@ public sealed class GameMenu : MenuContainer
 
 		var battle = new Battle();
 		if (Game.Singleton is { } game)
-			foreach (var partyMember in game.Party)
-				battle.AddBattleMember(partyMember);
+			battle.AddParty(game.Party);
 
 		battle.AddBattleMember(new GiantRat { Name = "Giant Rat 1" });
 		battle.AddBattleMember(new GiantRat { Name = "Giant Rat 2" });
