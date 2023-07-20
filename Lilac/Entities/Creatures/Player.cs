@@ -3,23 +3,37 @@ using Lilac.Combat;
 using Lilac.Components;
 using Lilac.Components.Controllers;
 using Lilac.Dice;
+using Lilac.Items;
 using Attribute = Lilac.Combat.Attribute;
 
 namespace Lilac.Entities.Creatures;
 
 public sealed class Player : Creature
 {
-	public Player(Character character) : base(character.Race.DisplayName)
+	public Player(Character character)
+		: base(character.Race.DisplayName)
 	{
 		Name = character.Name;
 		AddComponent(new UserController(this));
+
 		var equipmentComponent = new EquipmentComponent();
 		AddComponent(equipmentComponent);
-		AddComponent(new InventoryComponent(equipmentComponent));
+
+		var inventoryComponent = new InventoryComponent(equipmentComponent);
+		AddComponent(inventoryComponent);
+
 		AddComponent(new CharacterComponent(character, GetComponent<StatsComponent>() ??
 													   throw new Exception("Player requires a StatsComponent.")));
 
 		JoinAllegiance(Allegiance.Player);
+
+		if (character.StartingWeapon is not null)
+		{
+			var startingWeapon = new WeaponInstance(character.StartingWeapon, Material.Bronze);
+			inventoryComponent.AddItem(startingWeapon);
+			equipmentComponent.Equip(startingWeapon);
+		}
+
 		UpdateCombatStats();
 
 		if (GetComponent<CombatComponent>() is not { } combatComponent)

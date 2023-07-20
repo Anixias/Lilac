@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Lilac.Combat;
 using Lilac.Entities;
+using Lilac.Items;
 using Lilac.Rendering;
 
 namespace Lilac.Menus;
@@ -10,9 +12,10 @@ public sealed class CharacterCreationMenu : MenuContainer
 {
 	public delegate void EventHandler();
 
-	private int menuIndex;
-	private readonly List<IMenu> menus = new();
 	private readonly Character character;
+	private readonly List<IMenu> menus = new();
+
+	private int menuIndex;
 
 	public CharacterCreationMenu(Character character)
 	{
@@ -22,16 +25,17 @@ public sealed class CharacterCreationMenu : MenuContainer
 		AddMenu<PlayerColorMenu>();
 		AddMenu<PlayerClassMenu>();
 		AddMenu<PlayerRaceMenu>();
+		AddMenu<WeaponSelectMenu>();
 		AddMenu<MagicQuizMenu>();
 
 		Start();
 	}
-	
+
 	private void AddMenu<T>() where T : ICharacterMenu, new()
 	{
 		T menu = new()
 		{
-			Character = this.character
+			Character = character
 		};
 
 		menu.OnSubmitted += Advance;
@@ -96,12 +100,9 @@ public sealed class CharacterCreationMenu : MenuContainer
 
 	private sealed class PlayerNameMenu : Prompt, ICharacterMenu
 	{
-		public Character? Character { get; init; }
-		public event EventHandler? OnSubmitted;
-
 		public PlayerNameMenu()
 		{
-			OnInputSubmitted += input => 
+			OnInputSubmitted += input =>
 			{
 				if (Character is not null)
 					Character.Name = input;
@@ -110,23 +111,22 @@ public sealed class CharacterCreationMenu : MenuContainer
 			};
 		}
 
+		public Character? Character { get; init; }
+		public event EventHandler? OnSubmitted;
+
 		public override void RenderTitle()
 		{
 			Screen.WriteLine("What is your name?");
 		}
 
-        public override void Activated()
-        {
-            Input = Character?.Name ?? "Player";
-        }
-    
+		public override void Activated()
+		{
+			Input = Character?.Name ?? "Player";
+		}
 	}
 
 	private sealed class PlayerColorMenu : Menu, IReturnableMenu, ICharacterMenu
 	{
-
-		public Character? Character { get; init; }
-
 		private StandardColor selectedColor;
 
 		public PlayerColorMenu()
@@ -158,7 +158,7 @@ public sealed class CharacterCreationMenu : MenuContainer
 				},
 				new Option("Next")
 				{
-					selected = () => 
+					selected = () =>
 					{
 						if (Character is not null)
 							Character.Color = selectedColor;
@@ -172,6 +172,8 @@ public sealed class CharacterCreationMenu : MenuContainer
 				}
 			};
 		}
+
+		public Character? Character { get; init; }
 
 		public event CharacterCreationMenu.EventHandler? OnSubmitted;
 		public event ISelectionMenu.EventHandler? OnBackSelected;
@@ -187,8 +189,6 @@ public sealed class CharacterCreationMenu : MenuContainer
 
 	private sealed class PlayerClassMenu : Menu, IReturnableMenu, ICharacterMenu
 	{
-		public Character? Character { get; init; }
-
 		private Class selectedClass;
 
 		public PlayerClassMenu()
@@ -210,7 +210,7 @@ public sealed class CharacterCreationMenu : MenuContainer
 				},
 				new Option("Next")
 				{
-					selected = () => 
+					selected = () =>
 					{
 						if (Character is not null)
 							Character.Class = selectedClass;
@@ -224,6 +224,8 @@ public sealed class CharacterCreationMenu : MenuContainer
 				}
 			};
 		}
+
+		public Character? Character { get; init; }
 
 		public event CharacterCreationMenu.EventHandler? OnSubmitted;
 		public event ISelectionMenu.EventHandler? OnBackSelected;
@@ -241,8 +243,6 @@ public sealed class CharacterCreationMenu : MenuContainer
 
 	private sealed class PlayerRaceMenu : Menu, IReturnableMenu, ICharacterMenu
 	{
-		public Character? Character { get; init; }
-
 		private Race selectedRace;
 
 		public PlayerRaceMenu()
@@ -266,7 +266,7 @@ public sealed class CharacterCreationMenu : MenuContainer
 				},
 				new Option("Next")
 				{
-					selected = () => 
+					selected = () =>
 					{
 						if (Character is not null)
 							Character.Race = selectedRace;
@@ -280,6 +280,8 @@ public sealed class CharacterCreationMenu : MenuContainer
 				}
 			};
 		}
+
+		public Character? Character { get; init; }
 
 		public event CharacterCreationMenu.EventHandler? OnSubmitted;
 		public event ISelectionMenu.EventHandler? OnBackSelected;
@@ -296,9 +298,65 @@ public sealed class CharacterCreationMenu : MenuContainer
 		}
 	}
 
+	private sealed class WeaponSelectMenu : Menu, IReturnableMenu, ICharacterMenu
+	{
+		private Weapon selectedWeapon;
+
+		public WeaponSelectMenu()
+		{
+			var weapons = new[]
+			{
+				Weapon.Saber,
+				Weapon.Scimitar,
+				Weapon.Claymore
+			};
+
+			selectedWeapon = weapons[0];
+
+			Options = new[]
+			{
+				new Option("Weapon", weapons.Select(w => w.Name).ToArray())
+				{
+					valueChanged = index => selectedWeapon = weapons[index]
+				},
+				new Option("Next")
+				{
+					selected = () =>
+					{
+						if (Character is not null)
+							Character.StartingWeapon = selectedWeapon;
+
+						OnSubmitted?.Invoke();
+					}
+				},
+				new Option("Back")
+				{
+					selected = () => OnBackSelected?.Invoke()
+				}
+			};
+		}
+
+		public Character? Character { get; init; }
+		public event CharacterCreationMenu.EventHandler? OnSubmitted;
+		public event ISelectionMenu.EventHandler? OnBackSelected;
+
+		public override void RenderTitle()
+		{
+			Screen.WriteLine("Select a starting weapon type:\n");
+			Screen.ForegroundColor = StandardColor.DarkGray;
+			Screen.WriteLine(selectedWeapon.Description + "\n");
+			Screen.ResetColor();
+			Screen.WriteLine("Attribute: ".PadRight(16) + selectedWeapon.AttackAttribute);
+			Screen.WriteLine("Two-Handed: ".PadRight(16) + selectedWeapon.TwoHanded);
+			Screen.WriteLine("Hit Bonus: ".PadRight(16) + (selectedWeapon.HitBonus > 0 ? "+" : "") +
+							 selectedWeapon.HitBonus);
+			Screen.WriteLine("Damage Type: ".PadRight(16) + selectedWeapon.DamageType.DisplayName);
+			Screen.WriteLine("Damage Roll: ".PadRight(16) + selectedWeapon.DamageRoll);
+		}
+	}
+
 	private sealed class MagicQuizMenu : Menu, ICharacterMenu
 	{
-		public Character? Character { get; init; }
 		private readonly Question[] questions;
 		private int clockwiseScore;
 		private int counterClockwiseScore;
@@ -478,6 +536,8 @@ public sealed class CharacterCreationMenu : MenuContainer
 
 			Start();
 		}
+
+		public Character? Character { get; init; }
 
 		public event CharacterCreationMenu.EventHandler? OnSubmitted;
 
