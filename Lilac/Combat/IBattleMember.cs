@@ -15,4 +15,5 @@ public interface IBattleMember : IRelationship
 	void TurnChanged();
 	int GetInitiative();
 	void PrepareForBattle(Battle battle);
+	string Name { get; set; }
 }

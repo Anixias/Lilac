@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Lilac.Components;
@@ -52,6 +53,17 @@ public sealed class Battle
 	{
 		foreach (var battleMember in battleMembers)
 			AddBattleMember(battleMember);
+	}
+
+	public void GenerateGroup<T>(Func<T> creator, int count) where T : IBattleMember
+	{
+		for (var i = 1; i <= count; i++)
+		{
+			var member = creator();
+			member.Name += $" {i}";
+
+			AddBattleMember(member);
+		}
 	}
 
 	public void RemoveBattleMember(IBattleMember battleMember)

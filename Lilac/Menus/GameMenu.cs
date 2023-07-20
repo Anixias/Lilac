@@ -25,9 +25,7 @@ public sealed class GameMenu : MenuContainer
 		if (Game.Singleton is { } game)
 			battle.AddParty(game.Party);
 
-		battle.AddBattleMember(new GiantRat { Name = "Giant Rat 1" });
-		battle.AddBattleMember(new GiantRat { Name = "Giant Rat 2" });
-		battle.AddBattleMember(new GiantRat { Name = "Giant Rat 3" });
+		battle.GenerateGroup(() => new GiantRat(1), 3);
 
 		battle.Begin();
 		var battleMenu = new BattleMenu(battle);

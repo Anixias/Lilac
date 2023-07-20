@@ -5,18 +5,12 @@ using Lilac.Dice;
 
 namespace Lilac.Entities.Creatures;
 
-public sealed class GiantRat : Creature
+public sealed class GiantRat : WildBeast
 {
-	public GiantRat(int level = 1) : base("Giant Rat", level)
+	public GiantRat(int level)
+	 : base("Giant Rat", level, 5, 10)
 	{
-		AddComponent(new AIController(this));
-		AddComponent(new RewardComponent
-		{
-			XP = 10 * level
-		});
-
-		var stats = GetComponent<StatsComponent>();
-		if (stats is not null)
+		if (GetComponent<StatsComponent>() is { } stats)
 		{
 			stats.Strength = 6;
 			stats.Agility = 10;
@@ -25,9 +19,6 @@ public sealed class GiantRat : Creature
 			stats.Perception = 12;
 			stats.Charisma = 1;
 		}
-
-		JoinAllegiance(Allegiance.Wild);
-		JoinAllegiance(Allegiance.Aggressive);
 
 		if (GetComponent<CombatComponent>() is not { } combatComponent)
 			return;
@@ -39,6 +30,6 @@ public sealed class GiantRat : Creature
 
 	public override void Render()
 	{
-		Render(Name);
+		Render(Name, Level);
 	}
 }

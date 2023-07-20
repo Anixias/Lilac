@@ -53,7 +53,7 @@ public abstract class Creature : Entity, IHittable, IBattleMember, IAttacker
 
     public RelationshipState? InboundDefaultRelationship { get; init; }
 
-    public string Name { get; init; }
+    public string Name { get; set; }
 
     public bool IsDead => Health <= 0;
     public Allegiance[] Allegiances => allegiances.ToArray();
@@ -69,9 +69,19 @@ public abstract class Creature : Entity, IHittable, IBattleMember, IAttacker
 	public bool IsUser => GetComponent<IController>()?.IsUser ?? false;
     public string Species { get; }
 
-    protected static void Render(string name)
+    protected static void Render(string name, int level = -1)
     {
         Screen.Write(name);
+
+        if (level <= 0)
+            return;
+
+        var prevColor = Screen.ForegroundColor;
+
+        Screen.ForegroundColor = StandardColor.Yellow;
+        Screen.Write($" [L{level}]");
+
+        Screen.ForegroundColor = prevColor;
     }
 
     /// <summary>Prepares this <see cref="Creature"/> for battle by rolling Initiative, setting up Stealth parameters, and more.</summary>
