@@ -19,6 +19,7 @@ public sealed class GameMenu : MenuContainer
 			() => { showControls = !showControls; });
 
 		customKeyEvents.Add(new ConsoleKeyInfo('p', ConsoleKey.P, false, true, false), ShowPartyInformation);
+		customKeyEvents.Add(new ConsoleKeyInfo('\t', ConsoleKey.Tab, false, false, false), ShowInventory);
 	}
 
 	private void ShowPartyInformation()
@@ -29,9 +30,22 @@ public sealed class GameMenu : MenuContainer
 		var previousMenu = CurrentMenu;
 
 		var characterInformationMenu = new CharacterInformationMenu();
-		characterInformationMenu.OnContinueSelected += () => { CurrentMenu = previousMenu; };
+		characterInformationMenu.OnContinueSelected += () => CurrentMenu = previousMenu;
 
 		CurrentMenu = characterInformationMenu;
+	}
+
+	private void ShowInventory()
+	{
+		if (CurrentMenu is InventoryMenu)
+			return;
+
+		var previousMenu = CurrentMenu;
+
+		var inventoryMenu = new InventoryMenu();
+		inventoryMenu.OnContinueSelected += () => CurrentMenu = previousMenu;
+
+		CurrentMenu = inventoryMenu;
 	}
 
 	protected override void RenderContainerTitle()
@@ -251,6 +265,83 @@ public sealed class GameMenu : MenuContainer
 		{
 			Attributes,
 			Combat
+		}
+	}
+
+	private sealed class InventoryMenu : Menu
+	{
+		private readonly Page equipmentPage = new("Equipment");
+		private readonly Page inventoryPage = new("Inventory");
+		private Creature? selectedMember;
+		private Page selectedPage;
+
+		public InventoryMenu()
+		{
+			if (Game.Singleton is null)
+			{
+				selectedPage = inventoryPage;
+				return;
+			}
+
+			if (Game.Singleton.Party.Count > 0)
+				selectedMember = Game.Singleton.Party[0];
+
+			var characters = new string[Game.Singleton.Party.Count];
+
+			for (var i = 0; i < characters.Length; i++) characters[i] = Game.Singleton.Party[i].Name;
+
+			inventoryPage.Options = new[]
+			{
+				new Option("Party Member", characters)
+				{
+					valueChanged = index => { selectedMember = Game.Singleton.Party[index]; }
+				},
+				new Option("Manage Equipment")
+				{
+					selected = () => { SelectedPage = equipmentPage; }
+				},
+				new Option("Continue")
+				{
+					selected = () => OnContinueSelected?.Invoke()
+				}
+			};
+
+			selectedPage = inventoryPage;
+			Options = selectedPage.Options;
+		}
+
+		private Page SelectedPage
+		{
+			get => selectedPage;
+			set
+			{
+				selectedPage = value;
+				Options = selectedPage.Options;
+			}
+		}
+
+		public event EventHandler? OnContinueSelected;
+
+		public override void RenderTitle()
+		{
+			Screen.ForegroundColor = StandardColor.DarkGreen;
+			Screen.Write("# ========= ");
+			Screen.ForegroundColor = StandardColor.Blue;
+			Screen.Write(SelectedPage.Title);
+			Screen.ForegroundColor = StandardColor.DarkGreen;
+			Screen.WriteLine(" ========= #");
+			Screen.ResetColor();
+		}
+
+		private sealed class Page
+		{
+			public Page(string title)
+			{
+				Title = title;
+			}
+
+			public string Title { get; }
+			public Option[] Options { get; set; } = Array.Empty<Option>();
 		}
 	}
 

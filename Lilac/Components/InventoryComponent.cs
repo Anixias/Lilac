@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using Lilac.Items;
 
 namespace Lilac.Components;
@@ -13,7 +14,7 @@ public sealed class InventoryComponent : IComponent
 		this.equipmentComponent = equipmentComponent;
 	}
 
-	public IEnumerable<ItemInstance> Items => items;
+	public IEnumerable<ItemInstance> Items => items.OrderBy(i => i.Name);
 
 	public void AddItem(ItemInstance item)
 	{
