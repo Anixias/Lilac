@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Lilac.Combat;
 using Lilac.Entities;
 using Lilac.Rendering;
@@ -9,54 +10,67 @@ public sealed class CharacterCreationMenu : MenuContainer
 {
 	public delegate void EventHandler();
 
+	private int menuIndex;
+	private readonly List<IMenu> menus = new();
+	private readonly Character character;
+
 	public CharacterCreationMenu(Character character)
 	{
-		var playerNameMenu = new PlayerNameMenu(character.Name);
-		playerNameMenu.OnInputSubmitted += input =>
+		this.character = character;
+
+		AddMenu<PlayerNameMenu>();
+		AddMenu<PlayerColorMenu>();
+		AddMenu<PlayerClassMenu>();
+		AddMenu<PlayerRaceMenu>();
+		AddMenu<MagicQuizMenu>();
+
+		Start();
+	}
+	
+	private void AddMenu<T>() where T : ICharacterMenu, new()
+	{
+		T menu = new()
 		{
-			character.Name = input;
-
-			var playerColorMenu = new PlayerColorMenu(character.Name);
-			playerColorMenu.OnColorSelected += color =>
-			{
-				character.Color = color;
-
-				var playerClassMenu = new PlayerClassMenu();
-				playerClassMenu.OnClassSelected += @class =>
-				{
-					character.Class = @class;
-
-					var playerRaceMenu = new PlayerRaceMenu();
-					playerRaceMenu.OnRaceSelected += race =>
-					{
-						character.Race = race;
-
-						var magicQuizMenu = new MagicQuizMenu(character);
-						magicQuizMenu.OnQuizComplete += () => { OnCharacterFinished?.Invoke(); };
-
-						currentMenu = magicQuizMenu;
-					};
-
-					playerRaceMenu.OnBackSelected += () => { currentMenu = playerClassMenu; };
-
-					currentMenu = playerRaceMenu;
-				};
-
-				playerClassMenu.OnBackSelected += () => { currentMenu = playerColorMenu; };
-
-				currentMenu = playerClassMenu;
-			};
-
-			playerColorMenu.OnBackSelected += () =>
-			{
-				playerNameMenu.SetInput(character.Name);
-				currentMenu = playerNameMenu;
-			};
-
-			currentMenu = playerColorMenu;
+			Character = this.character
 		};
 
-		currentMenu = playerNameMenu;
+		menu.OnSubmitted += Advance;
+
+		if (menu is IReturnableMenu returnableMenu)
+			returnableMenu.OnBackSelected += Return;
+
+		menus.Add(menu);
+	}
+
+	private void Start()
+	{
+		if (menuIndex < 0 || menuIndex >= menus.Count)
+		{
+			CurrentMenu = null;
+			return;
+		}
+
+		CurrentMenu = menus[menuIndex];
+	}
+
+	private void Advance()
+	{
+		menuIndex++;
+
+		if (menuIndex >= menus.Count)
+		{
+			OnCharacterFinished?.Invoke();
+			CurrentMenu = null;
+			return;
+		}
+
+		CurrentMenu = menus[menuIndex];
+	}
+
+	private void Return()
+	{
+		menuIndex = Math.Max(0, menuIndex - 1);
+		CurrentMenu = menus[menuIndex];
 	}
 
 	public event EventHandler? OnCharacterFinished;
@@ -74,30 +88,49 @@ public sealed class CharacterCreationMenu : MenuContainer
 		Screen.ResetColor();
 	}
 
-	private sealed class PlayerNameMenu : Prompt
+	private interface ICharacterMenu : IMenu
 	{
-		public PlayerNameMenu(string existingName)
+		Character Character { init; }
+		event EventHandler? OnSubmitted;
+	}
+
+	private sealed class PlayerNameMenu : Prompt, ICharacterMenu
+	{
+		public Character? Character { get; init; }
+		public event EventHandler? OnSubmitted;
+
+		public PlayerNameMenu()
 		{
-			Input = existingName;
+			OnInputSubmitted += input => 
+			{
+				if (Character is not null)
+					Character.Name = input;
+
+				OnSubmitted?.Invoke();
+			};
 		}
 
 		public override void RenderTitle()
 		{
 			Screen.WriteLine("What is your name?");
 		}
+
+        public override void Activated()
+        {
+            Input = Character?.Name ?? "Player";
+        }
+    
 	}
 
-	private sealed class PlayerColorMenu : Menu
+	private sealed class PlayerColorMenu : Menu, IReturnableMenu, ICharacterMenu
 	{
-		public delegate void ColorEventHandler(IColor color);
 
-		private readonly string displayName;
+		public Character? Character { get; init; }
 
 		private StandardColor selectedColor;
 
-		public PlayerColorMenu(string characterName)
+		public PlayerColorMenu()
 		{
-			displayName = characterName;
 			selectedColor = StandardColor.Red;
 
 			Options = new[]
@@ -125,7 +158,13 @@ public sealed class CharacterCreationMenu : MenuContainer
 				},
 				new Option("Next")
 				{
-					selected = () => OnColorSelected?.Invoke(selectedColor)
+					selected = () => 
+					{
+						if (Character is not null)
+							Character.Color = selectedColor;
+
+						OnSubmitted?.Invoke();
+					}
 				},
 				new Option("Back")
 				{
@@ -134,21 +173,21 @@ public sealed class CharacterCreationMenu : MenuContainer
 			};
 		}
 
-		public event ColorEventHandler? OnColorSelected;
-		public event EventHandler? OnBackSelected;
+		public event CharacterCreationMenu.EventHandler? OnSubmitted;
+		public event ISelectionMenu.EventHandler? OnBackSelected;
 
 		public override void RenderTitle()
 		{
 			Screen.WriteLine("Select a color for your name and HUD:\n");
 			Screen.ForegroundColor = selectedColor;
-			Screen.WriteLine(displayName);
+			Screen.WriteLine(Character?.Name ?? "Player");
 			Screen.WriteLine();
 		}
 	}
 
-	private sealed class PlayerClassMenu : Menu
+	private sealed class PlayerClassMenu : Menu, IReturnableMenu, ICharacterMenu
 	{
-		public delegate void ClassEventHandler(Class @class);
+		public Character? Character { get; init; }
 
 		private Class selectedClass;
 
@@ -171,7 +210,13 @@ public sealed class CharacterCreationMenu : MenuContainer
 				},
 				new Option("Next")
 				{
-					selected = () => OnClassSelected?.Invoke(selectedClass)
+					selected = () => 
+					{
+						if (Character is not null)
+							Character.Class = selectedClass;
+
+						OnSubmitted?.Invoke();
+					}
 				},
 				new Option("Back")
 				{
@@ -180,8 +225,8 @@ public sealed class CharacterCreationMenu : MenuContainer
 			};
 		}
 
-		public event ClassEventHandler? OnClassSelected;
-		public event EventHandler? OnBackSelected;
+		public event CharacterCreationMenu.EventHandler? OnSubmitted;
+		public event ISelectionMenu.EventHandler? OnBackSelected;
 
 		public override void RenderTitle()
 		{
@@ -194,9 +239,9 @@ public sealed class CharacterCreationMenu : MenuContainer
 		}
 	}
 
-	private sealed class PlayerRaceMenu : Menu
+	private sealed class PlayerRaceMenu : Menu, IReturnableMenu, ICharacterMenu
 	{
-		public delegate void RaceEventHandler(Race race);
+		public Character? Character { get; init; }
 
 		private Race selectedRace;
 
@@ -221,7 +266,13 @@ public sealed class CharacterCreationMenu : MenuContainer
 				},
 				new Option("Next")
 				{
-					selected = () => OnRaceSelected?.Invoke(selectedRace)
+					selected = () => 
+					{
+						if (Character is not null)
+							Character.Race = selectedRace;
+
+						OnSubmitted?.Invoke();
+					}
 				},
 				new Option("Back")
 				{
@@ -230,8 +281,8 @@ public sealed class CharacterCreationMenu : MenuContainer
 			};
 		}
 
-		public event RaceEventHandler? OnRaceSelected;
-		public event EventHandler? OnBackSelected;
+		public event CharacterCreationMenu.EventHandler? OnSubmitted;
+		public event ISelectionMenu.EventHandler? OnBackSelected;
 
 		public override void RenderTitle()
 		{
@@ -245,9 +296,9 @@ public sealed class CharacterCreationMenu : MenuContainer
 		}
 	}
 
-	private sealed class MagicQuizMenu : Menu
+	private sealed class MagicQuizMenu : Menu, ICharacterMenu
 	{
-		private readonly Character character;
+		public Character? Character { get; init; }
 		private readonly Question[] questions;
 		private int clockwiseScore;
 		private int counterClockwiseScore;
@@ -257,10 +308,8 @@ public sealed class CharacterCreationMenu : MenuContainer
 		private int spiritScore;
 		private int synthesisScore;
 
-		public MagicQuizMenu(Character character)
+		public MagicQuizMenu()
 		{
-			this.character = character;
-
 			questions = new[]
 			{
 				new Question
@@ -430,7 +479,7 @@ public sealed class CharacterCreationMenu : MenuContainer
 			Start();
 		}
 
-		public event EventHandler? OnQuizComplete;
+		public event CharacterCreationMenu.EventHandler? OnSubmitted;
 
 		public override void RenderTitle()
 		{
@@ -470,14 +519,20 @@ public sealed class CharacterCreationMenu : MenuContainer
 
 		private void FinishQuiz()
 		{
+			if (Character is null)
+			{
+				OnSubmitted?.Invoke();
+				return;
+			}
+
 			const int offset = 3;
-			character.Affinities.Add(DamageType.Fire, energyScore + clockwiseScore - offset);
-			character.Affinities.Add(DamageType.Electricity, energyScore + counterClockwiseScore - offset);
-			character.Affinities.Add(DamageType.Water, synthesisScore + clockwiseScore - offset);
-			character.Affinities.Add(DamageType.Earth, synthesisScore + counterClockwiseScore - offset);
-			character.Affinities.Add(DamageType.Shadow, spiritScore + clockwiseScore - offset);
-			character.Affinities.Add(DamageType.Air, spiritScore + counterClockwiseScore - offset);
-			OnQuizComplete?.Invoke();
+			Character.Affinities.Add(DamageType.Fire, energyScore + clockwiseScore - offset);
+			Character.Affinities.Add(DamageType.Electricity, energyScore + counterClockwiseScore - offset);
+			Character.Affinities.Add(DamageType.Water, synthesisScore + clockwiseScore - offset);
+			Character.Affinities.Add(DamageType.Earth, synthesisScore + counterClockwiseScore - offset);
+			Character.Affinities.Add(DamageType.Shadow, spiritScore + clockwiseScore - offset);
+			Character.Affinities.Add(DamageType.Air, spiritScore + counterClockwiseScore - offset);
+			OnSubmitted?.Invoke();
 		}
 
 		private sealed class Question
