@@ -52,7 +52,7 @@ public sealed class ArmorInstance : ItemInstance
 	public int GetArmor(DamageType damageType)
 	{
 		var baseArmor = ((Armor)Framework).Defenses.TryGetValue(damageType.Category, out var armor) ? armor : 0;
-		return baseArmor + Material.Power;
+		return baseArmor + Material.Power * 2;
 	}
 }
 
