@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Lilac.Combat;
 using Lilac.Components;
+using Lilac.Entities;
 using Lilac.Entities.Creatures;
 using Lilac.Maps;
 using Lilac.Rendering;
@@ -271,7 +272,34 @@ public sealed class GameMenu : MenuContainer
 	private sealed class InventoryMenu : Menu
 	{
 		private readonly Page equipmentPage = new("Equipment");
-		private readonly Page inventoryPage = new("Inventory");
+
+		private readonly Page inventoryPage = new("Inventory")
+		{
+			Render = entity =>
+			{
+				if (entity.GetComponent<InventoryComponent>() is not { } inventoryComponent)
+					return;
+
+				foreach (var item in inventoryComponent.Items)
+				{
+					Screen.Write(item.Name);
+
+					if (entity.GetComponent<EquipmentComponent>() is { } equipmentComponent)
+					{
+						var prevColor = Screen.ForegroundColor;
+						Screen.ForegroundColor = StandardColor.Green;
+
+						if (equipmentComponent.IsEquipped(item))
+							Screen.Write(" (Eq)");
+
+						Screen.ForegroundColor = prevColor;
+					}
+
+					Screen.WriteLine();
+				}
+			}
+		};
+
 		private Creature? selectedMember;
 		private Page selectedPage;
 
@@ -331,6 +359,9 @@ public sealed class GameMenu : MenuContainer
 			Screen.ForegroundColor = StandardColor.DarkGreen;
 			Screen.WriteLine(" ========= #");
 			Screen.ResetColor();
+
+			if (selectedMember is not null)
+				selectedPage.Render?.Invoke(selectedMember);
 		}
 
 		private sealed class Page
@@ -342,6 +373,7 @@ public sealed class GameMenu : MenuContainer
 
 			public string Title { get; }
 			public Option[] Options { get; set; } = Array.Empty<Option>();
+			public Action<Entity>? Render { get; init; }
 		}
 	}
 
