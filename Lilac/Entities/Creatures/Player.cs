@@ -34,11 +34,25 @@ public sealed class Player : Creature
 			equipmentComponent.Equip(startingWeapon);
 		}
 
+		var startingArmor = character.StartingArmor switch
+		{
+			Armor.MetalArmor   => new ArmorInstance(character.StartingArmor, Material.Bronze),
+			Armor.LeatherArmor => new ArmorInstance(character.StartingArmor, Material.Padded),
+			_                  => null
+		};
+
+		if (startingArmor is not null)
+		{
+			inventoryComponent.AddItem(startingArmor);
+			equipmentComponent.Equip(startingArmor);
+		}
+
 		UpdateCombatStats();
 
 		if (GetComponent<CombatComponent>() is not { } combatComponent)
 			return;
 
+		combatComponent.equipmentComponent = equipmentComponent;
 		combatComponent.Affinities = character.Affinities;
 		equipmentComponent.OnEquipmentChanged += UpdateCombatStats;
 	}

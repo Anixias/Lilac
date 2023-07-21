@@ -17,6 +17,7 @@ public sealed class CombatComponent : IComponent
 
 	private readonly StatsComponent statsComponent;
 	public BattleState battleState;
+	public EquipmentComponent? equipmentComponent;
 
 	public CombatComponent(StatsComponent statsComponent)
 	{
@@ -47,6 +48,12 @@ public sealed class CombatComponent : IComponent
 			var initiativeBonus = 0;
 			foreach (var bonus in statsComponent.bonuses) initiativeBonus += bonus.Initiative;
 
+			if (equipmentComponent is not null)
+			{
+				initiativeBonus += equipmentComponent.Armor?.InitiativeBonus ?? 0;
+				initiativeBonus += equipmentComponent.Shield?.InitiativeBonus ?? 0;
+			}
+
 			return Roll.Die.D20 + ((statsComponent.Agility + statsComponent.Perception) / 4 + initiativeBonus);
 		}
 	}
@@ -59,6 +66,12 @@ public sealed class CombatComponent : IComponent
 		var defenseBonus = 0;
 		foreach (var bonus in statsComponent.bonuses) defenseBonus += bonus.Defense;
 
+		if (equipmentComponent is not null)
+		{
+			defenseBonus += equipmentComponent.Armor?.GetArmor(damageType) ?? 0;
+			defenseBonus += equipmentComponent.Shield?.Defense ?? 0;
+		}
+
 		return defenseBonus + Defense + (Defenses.TryGetValue(damageType, out var defense) ? defense : 0);
 	}
 
@@ -70,21 +83,21 @@ public sealed class CombatComponent : IComponent
 		if (Affinities.TryGetValue(damageType, out var affinity) && affinity > 0)
 			affinityBonus += affinity * 2;
 
+		if (equipmentComponent is not null)
+			affinityBonus += equipmentComponent.Armor?.GetArmor(damageType) ?? 0;
+
 		return affinityBonus + Resistance + (Resistances.TryGetValue(damageType, out var resistance) ? resistance : 0);
 	}
 
 	/// <summary>Returns the final defense/resistance for the given <see cref="DamageType" />.</summary>
 	public int GetArmor(DamageType damageType)
 	{
-		switch (damageType)
+		return damageType switch
 		{
-			case DamageType.Physical physicalDamageType:
-				return GetDefense(physicalDamageType);
-			case DamageType.Magical magicalDamageType:
-				return GetResistance(magicalDamageType);
-			default:
-				return 0;
-		}
+			DamageType.Physical physicalDamageType => GetDefense(physicalDamageType),
+			DamageType.Magical magicalDamageType   => GetResistance(magicalDamageType),
+			_                                      => 0
+		};
 	}
 
 	public AttackResult RollAttack(CombatComponent? target)

@@ -13,6 +13,7 @@ public sealed class Character
 	public Race Race { get; set; } = Race.Human;
 	public Dictionary<DamageType.Magical, int> Affinities { get; } = new();
 	public Weapon? StartingWeapon { get; set; }
+	public Armor? StartingArmor { get; set; }
 
 	public void Display()
 	{

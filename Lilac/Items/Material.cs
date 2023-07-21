@@ -6,6 +6,8 @@ public abstract class Material
 	public static readonly Metal Iron = new("Iron", 3, 1);
 	public static readonly Metal Steel = new("Steel", 9, 2);
 
+	public static readonly Leather Padded = new("Padded", 1, 0);
+
 	private Material(string name, int costMultiplier, int power)
 	{
 		Name = name;

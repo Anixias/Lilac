@@ -26,6 +26,7 @@ public sealed class CharacterCreationMenu : MenuContainer
 		AddMenu<PlayerClassMenu>();
 		AddMenu<PlayerRaceMenu>();
 		AddMenu<WeaponSelectMenu>();
+		AddMenu<ArmorSelectMenu>();
 		AddMenu<MagicQuizMenu>();
 
 		Start();
@@ -352,6 +353,61 @@ public sealed class CharacterCreationMenu : MenuContainer
 							 selectedWeapon.HitBonus);
 			Screen.WriteLine("Damage Type: ".PadRight(16) + selectedWeapon.DamageType.DisplayName);
 			Screen.WriteLine("Damage Roll: ".PadRight(16) + selectedWeapon.DamageRoll);
+		}
+	}
+
+	private sealed class ArmorSelectMenu : Menu, IReturnableMenu, ICharacterMenu
+	{
+		private Armor selectedArmor;
+
+		public ArmorSelectMenu()
+		{
+			var armors = new Armor[]
+			{
+				Armor.Tunic, Armor.Robes, Armor.Hide,
+				Armor.Chainmail, Armor.Scale, Armor.Breastplate,
+				Armor.HalfPlate, Armor.FullPlate, Armor.Spellguard
+			};
+
+			selectedArmor = armors[0];
+
+			Options = new[]
+			{
+				new Option("Armor", armors.Select(w => w.Name).ToArray())
+				{
+					valueChanged = index => selectedArmor = armors[index]
+				},
+				new Option("Next")
+				{
+					selected = () =>
+					{
+						if (Character is not null)
+							Character.StartingArmor = selectedArmor;
+
+						OnSubmitted?.Invoke();
+					}
+				},
+				new Option("Back")
+				{
+					selected = () => OnBackSelected?.Invoke()
+				}
+			};
+		}
+
+		public Character? Character { get; init; }
+		public event CharacterCreationMenu.EventHandler? OnSubmitted;
+		public event ISelectionMenu.EventHandler? OnBackSelected;
+
+		public override void RenderTitle()
+		{
+			Screen.WriteLine("Select a starting armor type:\n");
+			Screen.ForegroundColor = StandardColor.DarkGray;
+			Screen.WriteLine(selectedArmor.Description + "\n");
+			Screen.ResetColor();
+			Screen.WriteLine("Defense: ".PadRight(16) + selectedArmor.Defenses[DamageCategory.Physical]);
+			Screen.WriteLine("Resistance: ".PadRight(16) + selectedArmor.Defenses[DamageCategory.Magical]);
+			Screen.WriteLine("Stealth Advantage: ".PadRight(16) + selectedArmor.StealthAdvantage);
+			Screen.WriteLine("Initiative: ".PadRight(16) + selectedArmor.InitiativeBonus);
 		}
 	}
 
