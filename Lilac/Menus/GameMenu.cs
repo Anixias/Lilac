@@ -394,14 +394,13 @@ public sealed class GameMenu : MenuContainer
 						{
 							new Option("Weapon", weapons.Select(w => w?.Name ?? "None").ToArray())
 							{
-								valueChanged = index =>
+								valueChanged = index => selectedItem = weapons[index],
+								selected = () =>
 								{
 									var eqComponent = selectedMember?.GetComponent<EquipmentComponent>();
 
 									if (eqComponent?.Weapon != null)
 										eqComponent.Unequip(eqComponent.Weapon);
-
-									selectedItem = weapons[index];
 
 									if (selectedItem is not null)
 										eqComponent?.Equip(selectedItem);
@@ -446,14 +445,13 @@ public sealed class GameMenu : MenuContainer
 						{
 							new Option("Armor", armors.Select(w => w?.Name ?? "None").ToArray())
 							{
-								valueChanged = index =>
+								valueChanged = index => selectedItem = armors[index],
+								selected = () =>
 								{
 									var eqComponent = selectedMember?.GetComponent<EquipmentComponent>();
 
 									if (eqComponent?.Armor != null)
 										eqComponent.Unequip(eqComponent.Armor);
-
-									selectedItem = armors[index];
 
 									if (selectedItem is not null)
 										eqComponent?.Equip(selectedItem);
@@ -498,14 +496,13 @@ public sealed class GameMenu : MenuContainer
 						{
 							new Option("Amulet", amulets.Select(w => w?.Name ?? "None").ToArray())
 							{
-								valueChanged = index =>
+								valueChanged = index => selectedItem = amulets[index],
+								selected = () =>
 								{
 									var eqComponent = selectedMember?.GetComponent<EquipmentComponent>();
 
 									if (eqComponent?.Amulet != null)
 										eqComponent.Unequip(eqComponent.Amulet);
-
-									selectedItem = amulets[index];
 
 									if (selectedItem is not null)
 										eqComponent?.Equip(selectedItem);
