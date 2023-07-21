@@ -282,6 +282,7 @@ public sealed class GameMenu : MenuContainer
 				Screen.WriteLine($"Weapon: {equipmentComponent.Weapon?.Name ?? "None"}");
 				Screen.WriteLine($"Armor: {equipmentComponent.Armor?.Name ?? "None"}");
 				Screen.WriteLine($"Amulet: {equipmentComponent.Amulet?.Name ?? "None"}");
+				Screen.WriteLine($"Shield: {equipmentComponent.Shield?.Name ?? "None"}");
 			}
 		};
 
