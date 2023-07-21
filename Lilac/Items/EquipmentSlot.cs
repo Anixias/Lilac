@@ -5,5 +5,6 @@ public enum EquipmentSlot
 	None,
 	Weapon,
 	Armor,
-	Amulet
+	Amulet,
+	Shield
 }

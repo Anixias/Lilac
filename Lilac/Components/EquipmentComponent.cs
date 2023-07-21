@@ -6,8 +6,9 @@ public sealed class EquipmentComponent : IComponent
 {
 	public delegate void EventHandler();
 
-	private ItemInstance? amulet;
-	private ItemInstance? armor;
+	private AmuletInstance? amulet;
+	private ArmorInstance? armor;
+	private ShieldInstance? shield;
 	private WeaponInstance? weapon;
 
 	public WeaponInstance? Weapon
@@ -20,7 +21,7 @@ public sealed class EquipmentComponent : IComponent
 		}
 	}
 
-	public ItemInstance? Armor
+	public ArmorInstance? Armor
 	{
 		get => armor;
 		private set
@@ -30,12 +31,22 @@ public sealed class EquipmentComponent : IComponent
 		}
 	}
 
-	public ItemInstance? Amulet
+	public AmuletInstance? Amulet
 	{
 		get => amulet;
 		private set
 		{
 			amulet = value;
+			OnEquipmentChanged?.Invoke();
+		}
+	}
+
+	public ShieldInstance? Shield
+	{
+		get => shield;
+		private set
+		{
+			shield = value;
 			OnEquipmentChanged?.Invoke();
 		}
 	}
@@ -58,6 +69,9 @@ public sealed class EquipmentComponent : IComponent
 		if (Amulet == item)
 			return true;
 
+		if (Shield == item)
+			return true;
+
 		return false;
 	}
 
@@ -75,21 +89,42 @@ public sealed class EquipmentComponent : IComponent
 
 		if (Amulet == item)
 			Amulet = null;
+
+		if (Shield == item)
+			Shield = null;
 	}
 
 	/// <summary>
 	///     Equips the given <see cref="ItemInstance" /> if it can be equipped.
 	/// </summary>
 	/// <param name="item">The item to equip.</param>
-	public void Equip(ItemInstance item)
+	/// <returns><see langword="true" /> if the item was equipped; <see langword="false" /> otherwise.</returns>
+	public bool Equip(ItemInstance item)
 	{
 		switch (item.Framework.EquipmentSlot)
 		{
 			case EquipmentSlot.Weapon:
+				if (((WeaponInstance)item).TwoHanded && Shield is not null)
+					return false;
+
 				Weapon = item as WeaponInstance;
 				break;
+			case EquipmentSlot.Armor:
+				Armor = item as ArmorInstance;
+				break;
+			case EquipmentSlot.Amulet:
+				Amulet = item as AmuletInstance;
+				break;
+			case EquipmentSlot.Shield:
+				if (Weapon?.TwoHanded ?? false)
+					return false;
+
+				Shield = item as ShieldInstance;
+				break;
 			default:
-				return;
+				return false;
 		}
+
+		return true;
 	}
 }

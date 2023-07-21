@@ -56,6 +56,20 @@ public sealed class ArmorInstance : ItemInstance
 	}
 }
 
+public sealed class ShieldInstance : ItemInstance
+{
+	public ShieldInstance(Shield framework, Material material)
+		: base(framework)
+	{
+		Material = material;
+	}
+
+	private Material Material { get; }
+	public override string Name => $"{Material.Name} {Framework.Name}";
+	public int InitiativeBonus => ((Shield)Framework).InitiativeBonus;
+	public int Defense => ((Shield)Framework).Defense + Material.Power;
+}
+
 public sealed class AmuletInstance : ItemInstance
 {
 	public AmuletInstance(Amulet framework)

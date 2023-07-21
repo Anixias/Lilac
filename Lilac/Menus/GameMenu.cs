@@ -334,6 +334,11 @@ public sealed class GameMenu : MenuContainer
 				Render = entity => RenderEquipmentChange(entity, EquipmentSlot.Amulet)
 			};
 
+			var changeShieldPage = new Page("Shield")
+			{
+				Render = entity => RenderEquipmentChange(entity, EquipmentSlot.Shield)
+			};
+
 			if (Game.Singleton is null)
 			{
 				selectedPage = inventoryPage;
@@ -503,6 +508,57 @@ public sealed class GameMenu : MenuContainer
 
 									if (eqComponent?.Amulet != null)
 										eqComponent.Unequip(eqComponent.Amulet);
+
+									if (selectedItem is not null)
+										eqComponent?.Equip(selectedItem);
+								},
+								SelectedValue = selectedIndex
+							},
+							new Option("Back")
+							{
+								selected = () => SelectedPage = equipmentPage
+							}
+						};
+
+						SelectedPage = changeAmuletPage;
+					}
+				},
+				new Option("Change Shield")
+				{
+					selected = () =>
+					{
+						if (selectedMember?.GetComponent<InventoryComponent>() is not { } inventoryComponent)
+							return;
+
+						var shields = new List<ItemInstance?>();
+
+						foreach (var item in inventoryComponent.Items)
+							if (item.Framework.EquipmentSlot == EquipmentSlot.Shield)
+								shields.Add(item);
+
+						shields = shields.OrderBy(w => w?.Name).ToList();
+						shields.Insert(0, null);
+
+						var selectedIndex = 0;
+						if (selectedMember?.GetComponent<EquipmentComponent>() is { } equipmentComponent)
+							selectedIndex = shields.IndexOf(equipmentComponent.Shield);
+
+						if (selectedIndex < 0)
+							selectedIndex = 0;
+
+						selectedItem = shields[selectedIndex];
+
+						changeShieldPage.Options = new[]
+						{
+							new Option("Shield", shields.Select(w => w?.Name ?? "None").ToArray())
+							{
+								valueChanged = index => selectedItem = shields[index],
+								selected = () =>
+								{
+									var eqComponent = selectedMember?.GetComponent<EquipmentComponent>();
+
+									if (eqComponent?.Shield != null)
+										eqComponent.Unequip(eqComponent.Shield);
 
 									if (selectedItem is not null)
 										eqComponent?.Equip(selectedItem);
