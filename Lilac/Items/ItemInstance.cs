@@ -1,5 +1,7 @@
-﻿using Lilac.Combat;
+﻿using System;
+using Lilac.Combat;
 using Lilac.Dice;
+using Attribute = Lilac.Combat.Attribute;
 
 namespace Lilac.Items;
 
@@ -24,8 +26,11 @@ public sealed class WeaponInstance : ItemInstance
 
 	private Material Material { get; }
 	public override string Name => $"{Material.Name} {Framework.Name}";
-	public Roll DamageRoll => ((Weapon)Framework).DamageRoll + Material.Power;
-	public int HitBonus => ((Weapon)Framework).HitBonus;
+
+	public Roll DamageRoll =>
+		((Weapon)Framework).DamageRoll + (Material.Power > 0 ? (int)Math.Pow(2, Material.Power) : 0);
+
+	public int HitBonus => ((Weapon)Framework).HitBonus + Material.Power;
 	public Attribute AttackAttribute => ((Weapon)Framework).AttackAttribute;
 	public DamageType DamageType => ((Weapon)Framework).DamageType;
 	public bool TwoHanded => ((Weapon)Framework).TwoHanded;
