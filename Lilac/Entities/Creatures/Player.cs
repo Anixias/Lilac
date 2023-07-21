@@ -43,6 +43,10 @@ public sealed class Player : Creature
 		equipmentComponent.OnEquipmentChanged += UpdateCombatStats;
 	}
 
+	public static Attribute DefaultAttribute => Attribute.Strength;
+	public static DamageType DefaultDamageType => DamageType.Crushing;
+	public static Roll DefaultDamageRoll => Roll.Die.D4;
+
 	public Character Character => GetComponent<CharacterComponent>()?.Character ??
 								  throw new Exception("Missing Character for Player.");
 
@@ -61,9 +65,8 @@ public sealed class Player : Creature
 
 		var equipmentComponent = GetComponent<EquipmentComponent>();
 
-		combatComponent.battleState.AttackAttribute =
-			equipmentComponent?.Weapon?.AttackAttribute ?? Attribute.Strength;
-		combatComponent.battleState.DamageType = equipmentComponent?.Weapon?.DamageType ?? DamageType.Crushing;
-		combatComponent.battleState.DamageRoll = equipmentComponent?.Weapon?.DamageRoll ?? Roll.Die.D4;
+		combatComponent.battleState.AttackAttribute = equipmentComponent?.Weapon?.AttackAttribute ?? DefaultAttribute;
+		combatComponent.battleState.DamageType = equipmentComponent?.Weapon?.DamageType ?? DefaultDamageType;
+		combatComponent.battleState.DamageRoll = equipmentComponent?.Weapon?.DamageRoll ?? DefaultDamageRoll;
 	}
 }
