@@ -315,8 +315,8 @@ public sealed class GameMenu : MenuContainer
 				selectedMember = Game.Singleton.Party[0];
 
 			var characters = new string[Game.Singleton.Party.Count];
-
-			for (var i = 0; i < characters.Length; i++) characters[i] = Game.Singleton.Party[i].Name;
+			for (var i = 0; i < characters.Length; i++)
+				characters[i] = Game.Singleton.Party[i].Name;
 
 			inventoryPage.Options = new[]
 			{
