@@ -30,3 +30,31 @@ public sealed class WeaponInstance : ItemInstance
 	public DamageType DamageType => ((Weapon)Framework).DamageType;
 	public bool TwoHanded => ((Weapon)Framework).TwoHanded;
 }
+
+public sealed class ArmorInstance : ItemInstance
+{
+	public ArmorInstance(Armor framework, Material material)
+		: base(framework)
+	{
+		Material = material;
+	}
+
+	private Material Material { get; }
+	public override string Name => $"{Material.Name} {Framework.Name}";
+	public int StealthAdvantage => ((Armor)Framework).StealthAdvantage;
+	public int InitiativeBonus => ((Armor)Framework).InitiativeBonus;
+
+	public int GetArmor(DamageType damageType)
+	{
+		var baseArmor = ((Armor)Framework).Defenses.TryGetValue(damageType.Category, out var armor) ? armor : 0;
+		return baseArmor + Material.Power;
+	}
+}
+
+public sealed class AmuletInstance : ItemInstance
+{
+	public AmuletInstance(Amulet framework)
+		: base(framework)
+	{
+	}
+}

@@ -24,4 +24,12 @@ public abstract class Material
 		{
 		}
 	}
+
+	public sealed class Leather : Material
+	{
+		public Leather(string name, int costMultiplier, int power)
+			: base(name, costMultiplier, power)
+		{
+		}
+	}
 }
