@@ -373,7 +373,7 @@ public sealed class CharacterCreationMenu : MenuContainer
 
 			Options = new[]
 			{
-				new Option("Armor", armors.Select(w => w.Name).ToArray())
+				new Option("Armor", armors.Select(a => a.Name).ToArray())
 				{
 					valueChanged = index => selectedArmor = armors[index]
 				},
@@ -404,8 +404,17 @@ public sealed class CharacterCreationMenu : MenuContainer
 			Screen.ForegroundColor = StandardColor.DarkGray;
 			Screen.WriteLine(selectedArmor.Description + "\n");
 			Screen.ResetColor();
-			Screen.WriteLine("Defense: ".PadRight(16) + selectedArmor.Defenses[DamageCategory.Physical]);
-			Screen.WriteLine("Resistance: ".PadRight(16) + selectedArmor.Defenses[DamageCategory.Magical]);
+
+			var defense = selectedArmor.Defenses.TryGetValue(DamageCategory.Physical, out var physicalDefense)
+				? physicalDefense
+				: 0;
+
+			var resistance = selectedArmor.Defenses.TryGetValue(DamageCategory.Magical, out var magicalDefense)
+				? magicalDefense
+				: 0;
+
+			Screen.WriteLine("Defense: ".PadRight(16) + (defense > 0 ? $"+{defense}" : defense));
+			Screen.WriteLine("Resistance: ".PadRight(16) + (resistance > 0 ? $"+{resistance}" : resistance));
 			Screen.WriteLine("Stealth Advantage: ".PadRight(16) + selectedArmor.StealthAdvantage);
 			Screen.WriteLine("Initiative: ".PadRight(16) + selectedArmor.InitiativeBonus);
 		}
