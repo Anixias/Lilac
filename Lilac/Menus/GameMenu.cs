@@ -618,6 +618,7 @@ public sealed class GameMenu : MenuContainer
 			if (entity.GetComponent<EquipmentComponent>() is not { } equipmentComponent)
 				return;
 
+			var prevFGColor = Screen.ForegroundColor;
 			switch (equipmentSlot)
 			{
 				default:
@@ -654,7 +655,6 @@ public sealed class GameMenu : MenuContainer
 					var newHitBonus = newWeapon?.HitBonus ?? 0;
 					Screen.Write($"Hit Bonus: {(currentHitBonus > 0 ? $"+{currentHitBonus}" : currentHitBonus)} -> ");
 
-					var prevFGColor = Screen.ForegroundColor;
 					Screen.ForegroundColor = newHitBonus > currentHitBonus
 						? StandardColor.DarkGreen
 						: newHitBonus < currentHitBonus
@@ -662,6 +662,123 @@ public sealed class GameMenu : MenuContainer
 							: prevFGColor;
 
 					Screen.WriteLine($"{(newHitBonus > 0 ? $"+{newHitBonus}" : newHitBonus)}");
+					Screen.ForegroundColor = prevFGColor;
+					break;
+				case EquipmentSlot.Armor:
+					var currentArmor = equipmentComponent.Armor;
+					var newArmor = selectedItem as ArmorInstance;
+
+					if (currentArmor == newArmor)
+					{
+						var prevColor = Screen.ForegroundColor;
+						Screen.ForegroundColor = StandardColor.Green;
+						Screen.WriteLine("(Equipped)");
+						Screen.ForegroundColor = prevColor;
+					}
+
+					// Defense
+					var currentArmorDefense = currentArmor?.GetArmor(DamageCategory.Physical) ?? 0;
+					var newArmorDefense = newArmor?.GetArmor(DamageCategory.Physical) ?? 0;
+					Screen.Write(
+						$"Defense: {(currentArmorDefense > 0 ? $"+{currentArmorDefense}" : currentArmorDefense)} -> ");
+
+					Screen.ForegroundColor = newArmorDefense > currentArmorDefense
+						? StandardColor.DarkGreen
+						: newArmorDefense < currentArmorDefense
+							? StandardColor.DarkRed
+							: prevFGColor;
+
+					Screen.WriteLine($"{(newArmorDefense > 0 ? $"+{newArmorDefense}" : newArmorDefense)}");
+					Screen.ForegroundColor = prevFGColor;
+
+					// Resistance
+					var currentArmorResistance = currentArmor?.GetArmor(DamageCategory.Magical) ?? 0;
+					var newArmorResistance = newArmor?.GetArmor(DamageCategory.Magical) ?? 0;
+					Screen.Write(
+						$"Resistance: {(currentArmorResistance > 0 ? $"+{currentArmorResistance}" : currentArmorResistance)} -> ");
+
+					Screen.ForegroundColor = newArmorResistance > currentArmorResistance
+						? StandardColor.DarkGreen
+						: newArmorResistance < currentArmorResistance
+							? StandardColor.DarkRed
+							: prevFGColor;
+
+					Screen.WriteLine($"{(newArmorResistance > 0 ? $"+{newArmorResistance}" : newArmorResistance)}");
+					Screen.ForegroundColor = prevFGColor;
+
+					// Stealth Advantage
+					var currentArmorStealthAdvantage = currentArmor?.StealthAdvantage ?? 0;
+					var newArmorStealthAdvantage = newArmor?.StealthAdvantage ?? 0;
+					Screen.Write(
+						$"Stealth Advantage: {(currentArmorStealthAdvantage > 0 ? $"+{currentArmorStealthAdvantage}" : currentArmorStealthAdvantage)} -> ");
+
+					Screen.ForegroundColor = newArmorStealthAdvantage > currentArmorStealthAdvantage
+						? StandardColor.DarkGreen
+						: newArmorStealthAdvantage < currentArmorStealthAdvantage
+							? StandardColor.DarkRed
+							: prevFGColor;
+
+					Screen.WriteLine(
+						$"{(newArmorStealthAdvantage > 0 ? $"+{newArmorStealthAdvantage}" : newArmorStealthAdvantage)}");
+					Screen.ForegroundColor = prevFGColor;
+
+					// Initiative
+					var currentArmorInitiative = currentArmor?.InitiativeBonus ?? 0;
+					var newArmorInitiative = newArmor?.InitiativeBonus ?? 0;
+					Screen.Write(
+						$"Initiative: {(currentArmorInitiative > 0 ? $"+{currentArmorInitiative}" : currentArmorInitiative)} -> ");
+
+					Screen.ForegroundColor = newArmorInitiative > currentArmorInitiative
+						? StandardColor.DarkGreen
+						: newArmorInitiative < currentArmorInitiative
+							? StandardColor.DarkRed
+							: prevFGColor;
+
+					Screen.WriteLine(
+						$"{(newArmorInitiative > 0 ? $"+{newArmorInitiative}" : newArmorInitiative)}");
+					Screen.ForegroundColor = prevFGColor;
+					break;
+				case EquipmentSlot.Shield:
+					var currentShield = equipmentComponent.Shield;
+					var newShield = selectedItem as ShieldInstance;
+
+					if (currentShield == newShield)
+					{
+						var prevColor = Screen.ForegroundColor;
+						Screen.ForegroundColor = StandardColor.Green;
+						Screen.WriteLine("(Equipped)");
+						Screen.ForegroundColor = prevColor;
+					}
+
+					// Defense
+					var currentShieldDefense = currentShield?.Defense ?? 0;
+					var newShieldDefense = newShield?.Defense ?? 0;
+					Screen.Write(
+						$"Defense: {(currentShieldDefense > 0 ? $"+{currentShieldDefense}" : currentShieldDefense)} -> ");
+
+					Screen.ForegroundColor = newShieldDefense > currentShieldDefense
+						? StandardColor.DarkGreen
+						: newShieldDefense < currentShieldDefense
+							? StandardColor.DarkRed
+							: prevFGColor;
+
+					Screen.WriteLine($"{(newShieldDefense > 0 ? $"+{newShieldDefense}" : newShieldDefense)}");
+					Screen.ForegroundColor = prevFGColor;
+
+					// Initiative
+					var currentShieldInitiative = currentShield?.InitiativeBonus ?? 0;
+					var newShieldInitiative = newShield?.InitiativeBonus ?? 0;
+					Screen.Write(
+						$"Initiative: {(currentShieldInitiative > 0 ? $"+{currentShieldInitiative}" : currentShieldInitiative)} -> ");
+
+					Screen.ForegroundColor = newShieldInitiative > currentShieldInitiative
+						? StandardColor.DarkGreen
+						: newShieldInitiative < currentShieldInitiative
+							? StandardColor.DarkRed
+							: prevFGColor;
+
+					Screen.WriteLine(
+						$"{(newShieldInitiative > 0 ? $"+{newShieldInitiative}" : newShieldInitiative)}");
 					Screen.ForegroundColor = prevFGColor;
 					break;
 			}

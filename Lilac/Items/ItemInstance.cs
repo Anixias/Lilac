@@ -51,7 +51,12 @@ public sealed class ArmorInstance : ItemInstance
 
 	public int GetArmor(DamageType damageType)
 	{
-		var baseArmor = ((Armor)Framework).Defenses.TryGetValue(damageType.Category, out var armor) ? armor : 0;
+		return GetArmor(damageType.Category);
+	}
+
+	public int GetArmor(DamageCategory damageCategory)
+	{
+		var baseArmor = ((Armor)Framework).Defenses.TryGetValue(damageCategory, out var armor) ? armor : 0;
 		return baseArmor + Material.Power * 2;
 	}
 }
