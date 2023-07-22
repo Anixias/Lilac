@@ -82,7 +82,7 @@ public abstract class Armor : IItem
 			{ DamageCategory.Magical, 2 }
 		}, -1, -2);
 
-	public static readonly MetalArmor Scale = new("Scale", "A medium set of scale mail.",
+	public static readonly MetalArmor ScaleMail = new("Scale Mail", "A medium set of scale mail.",
 		new Dictionary<DamageCategory, int>
 		{
 			{ DamageCategory.Physical, 3 },

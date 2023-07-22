@@ -365,7 +365,7 @@ public sealed class CharacterCreationMenu : MenuContainer
 			var armors = new Armor[]
 			{
 				Armor.Tunic, Armor.Robes, Armor.Hide,
-				Armor.Chainmail, Armor.Scale, Armor.Breastplate,
+				Armor.Chainmail, Armor.ScaleMail, Armor.Breastplate,
 				Armor.HalfPlate, Armor.FullPlate, Armor.Spellguard
 			};
 
