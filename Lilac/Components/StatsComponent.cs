@@ -1,22 +1,13 @@
 using System;
 using System.Collections.Generic;
 using Lilac.Entities;
+using Attribute = Lilac.Combat.Attribute;
 
 namespace Lilac.Components;
 
 public sealed class StatsComponent : IComponent
 {
 	public delegate void EventHandler();
-
-	public enum Attribute : byte
-	{
-		Strength,
-		Agility,
-		Intelligence,
-		Constitution,
-		Perception,
-		Charisma
-	}
 
 	public readonly List<Bonuses> bonuses = new();
 

@@ -7,3 +7,7 @@ obj/
 
 # VSCode ignores
 .vscode/
+
+*.png
+*.svg
+*.dot

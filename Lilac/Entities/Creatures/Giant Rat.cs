@@ -32,7 +32,7 @@ public sealed class GiantRat : Creature
 		if (GetComponent<CombatComponent>() is not { } combatComponent)
 			return;
 
-		combatComponent.battleState.AttackAttribute = StatsComponent.Attribute.Agility;
+		combatComponent.battleState.AttackAttribute = Attribute.Agility;
 		combatComponent.battleState.DamageType = DamageType.Piercing;
 		combatComponent.battleState.DamageRoll = Roll.Die.D4 + (1 + (level - 1) * 2);
 	}

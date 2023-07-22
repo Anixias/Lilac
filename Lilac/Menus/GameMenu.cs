@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using Lilac.Combat;
 using Lilac.Components;
+using Lilac.Entities;
 using Lilac.Entities.Creatures;
+using Lilac.Items;
 using Lilac.Maps;
 using Lilac.Rendering;
 
@@ -19,6 +21,7 @@ public sealed class GameMenu : MenuContainer
 			() => { showControls = !showControls; });
 
 		customKeyEvents.Add(new ConsoleKeyInfo('p', ConsoleKey.P, false, true, false), ShowPartyInformation);
+		customKeyEvents.Add(new ConsoleKeyInfo('\t', ConsoleKey.Tab, false, false, false), ShowInventory);
 	}
 
 	private void ShowPartyInformation()
@@ -29,9 +32,22 @@ public sealed class GameMenu : MenuContainer
 		var previousMenu = CurrentMenu;
 
 		var characterInformationMenu = new CharacterInformationMenu();
-		characterInformationMenu.OnContinueSelected += () => { CurrentMenu = previousMenu; };
+		characterInformationMenu.OnContinueSelected += () => CurrentMenu = previousMenu;
 
 		CurrentMenu = characterInformationMenu;
+	}
+
+	private void ShowInventory()
+	{
+		if (CurrentMenu is InventoryMenu)
+			return;
+
+		var previousMenu = CurrentMenu;
+
+		var inventoryMenu = new InventoryMenu();
+		inventoryMenu.OnContinueSelected += () => CurrentMenu = previousMenu;
+
+		CurrentMenu = inventoryMenu;
 	}
 
 	protected override void RenderContainerTitle()
@@ -251,6 +267,533 @@ public sealed class GameMenu : MenuContainer
 		{
 			Attributes,
 			Combat
+		}
+	}
+
+	private sealed class InventoryMenu : Menu
+	{
+		private readonly Page equipmentPage = new("Equipment")
+		{
+			Render = entity =>
+			{
+				if (entity.GetComponent<EquipmentComponent>() is not { } equipmentComponent)
+					return;
+
+				Screen.WriteLine($"Weapon: {equipmentComponent.Weapon?.Name ?? "None"}");
+				Screen.WriteLine($"Armor: {equipmentComponent.Armor?.Name ?? "None"}");
+				Screen.WriteLine($"Amulet: {equipmentComponent.Amulet?.Name ?? "None"}");
+				Screen.WriteLine($"Shield: {equipmentComponent.Shield?.Name ?? "None"}");
+			}
+		};
+
+		private readonly Page inventoryPage = new("Inventory")
+		{
+			Render = entity =>
+			{
+				if (entity.GetComponent<InventoryComponent>() is not { } inventoryComponent)
+					return;
+
+				foreach (var item in inventoryComponent.Items)
+				{
+					Screen.Write(item.Name);
+
+					if (entity.GetComponent<EquipmentComponent>() is { } equipmentComponent)
+					{
+						var prevColor = Screen.ForegroundColor;
+						Screen.ForegroundColor = StandardColor.Green;
+
+						if (equipmentComponent.IsEquipped(item))
+							Screen.Write(" (Eq)");
+
+						Screen.ForegroundColor = prevColor;
+					}
+
+					Screen.WriteLine();
+				}
+			}
+		};
+
+		private ItemInstance? selectedItem;
+
+		private Creature? selectedMember;
+		private Page selectedPage;
+
+		public InventoryMenu()
+		{
+			var changeWeaponPage = new Page("Weapon")
+			{
+				Render = entity => RenderEquipmentChange(entity, EquipmentSlot.Weapon)
+			};
+
+			var changeArmorPage = new Page("Armor")
+			{
+				Render = entity => RenderEquipmentChange(entity, EquipmentSlot.Armor)
+			};
+
+			var changeAmuletPage = new Page("Amulet")
+			{
+				Render = entity => RenderEquipmentChange(entity, EquipmentSlot.Amulet)
+			};
+
+			var changeShieldPage = new Page("Shield")
+			{
+				Render = entity => RenderEquipmentChange(entity, EquipmentSlot.Shield)
+			};
+
+			if (Game.Singleton is null)
+			{
+				selectedPage = inventoryPage;
+				return;
+			}
+
+			if (Game.Singleton.Party.Count > 0)
+				selectedMember = Game.Singleton.Party[0];
+
+			var characters = new string[Game.Singleton.Party.Count];
+			for (var i = 0; i < characters.Length; i++)
+				characters[i] = Game.Singleton.Party[i].Name;
+
+			inventoryPage.Options = new[]
+			{
+				new Option("Party Member", characters)
+				{
+					valueChanged = index => { selectedMember = Game.Singleton.Party[index]; }
+				},
+				new Option("Manage Equipment")
+				{
+					selected = () => { SelectedPage = equipmentPage; }
+				},
+				new Option("Continue")
+				{
+					selected = () => OnContinueSelected?.Invoke()
+				}
+			};
+
+			equipmentPage.Options = new[]
+			{
+				new Option("Change Weapon")
+				{
+					selected = () =>
+					{
+						if (selectedMember?.GetComponent<InventoryComponent>() is not { } inventoryComponent)
+							return;
+
+						var weapons = new List<ItemInstance?>();
+
+						foreach (var item in inventoryComponent.Items)
+							if (item.Framework.EquipmentSlot == EquipmentSlot.Weapon)
+								weapons.Add(item);
+
+						weapons = weapons.OrderBy(w => w?.Name).ToList();
+						weapons.Insert(0, null);
+
+						var selectedIndex = 0;
+						if (selectedMember?.GetComponent<EquipmentComponent>() is { } equipmentComponent)
+							selectedIndex = weapons.IndexOf(equipmentComponent.Weapon);
+
+						if (selectedIndex < 0)
+							selectedIndex = 0;
+
+						selectedItem = weapons[selectedIndex];
+
+						changeWeaponPage.Options = new[]
+						{
+							new Option("Weapon", weapons.Select(w => w?.Name ?? "None").ToArray())
+							{
+								valueChanged = index => selectedItem = weapons[index],
+								selected = () =>
+								{
+									var eqComponent = selectedMember?.GetComponent<EquipmentComponent>();
+
+									if (eqComponent?.Weapon != null)
+										eqComponent.Unequip(eqComponent.Weapon);
+
+									if (selectedItem is not null)
+										eqComponent?.Equip(selectedItem);
+								},
+								SelectedValue = selectedIndex
+							},
+							new Option("Back")
+							{
+								selected = () => SelectedPage = equipmentPage
+							}
+						};
+
+						SelectedPage = changeWeaponPage;
+					}
+				},
+				new Option("Change Armor")
+				{
+					selected = () =>
+					{
+						if (selectedMember?.GetComponent<InventoryComponent>() is not { } inventoryComponent)
+							return;
+
+						var armors = new List<ItemInstance?>();
+
+						foreach (var item in inventoryComponent.Items)
+							if (item.Framework.EquipmentSlot == EquipmentSlot.Armor)
+								armors.Add(item);
+
+						armors = armors.OrderBy(w => w?.Name).ToList();
+						armors.Insert(0, null);
+
+						var selectedIndex = 0;
+						if (selectedMember?.GetComponent<EquipmentComponent>() is { } equipmentComponent)
+							selectedIndex = armors.IndexOf(equipmentComponent.Armor);
+
+						if (selectedIndex < 0)
+							selectedIndex = 0;
+
+						selectedItem = armors[selectedIndex];
+
+						changeArmorPage.Options = new[]
+						{
+							new Option("Armor", armors.Select(w => w?.Name ?? "None").ToArray())
+							{
+								valueChanged = index => selectedItem = armors[index],
+								selected = () =>
+								{
+									var eqComponent = selectedMember?.GetComponent<EquipmentComponent>();
+
+									if (eqComponent?.Armor != null)
+										eqComponent.Unequip(eqComponent.Armor);
+
+									if (selectedItem is not null)
+										eqComponent?.Equip(selectedItem);
+								},
+								SelectedValue = selectedIndex
+							},
+							new Option("Back")
+							{
+								selected = () => SelectedPage = equipmentPage
+							}
+						};
+
+						SelectedPage = changeArmorPage;
+					}
+				},
+				new Option("Change Amulet")
+				{
+					selected = () =>
+					{
+						if (selectedMember?.GetComponent<InventoryComponent>() is not { } inventoryComponent)
+							return;
+
+						var amulets = new List<ItemInstance?>();
+
+						foreach (var item in inventoryComponent.Items)
+							if (item.Framework.EquipmentSlot == EquipmentSlot.Amulet)
+								amulets.Add(item);
+
+						amulets = amulets.OrderBy(w => w?.Name).ToList();
+						amulets.Insert(0, null);
+
+						var selectedIndex = 0;
+						if (selectedMember?.GetComponent<EquipmentComponent>() is { } equipmentComponent)
+							selectedIndex = amulets.IndexOf(equipmentComponent.Amulet);
+
+						if (selectedIndex < 0)
+							selectedIndex = 0;
+
+						selectedItem = amulets[selectedIndex];
+
+						changeAmuletPage.Options = new[]
+						{
+							new Option("Amulet", amulets.Select(w => w?.Name ?? "None").ToArray())
+							{
+								valueChanged = index => selectedItem = amulets[index],
+								selected = () =>
+								{
+									var eqComponent = selectedMember?.GetComponent<EquipmentComponent>();
+
+									if (eqComponent?.Amulet != null)
+										eqComponent.Unequip(eqComponent.Amulet);
+
+									if (selectedItem is not null)
+										eqComponent?.Equip(selectedItem);
+								},
+								SelectedValue = selectedIndex
+							},
+							new Option("Back")
+							{
+								selected = () => SelectedPage = equipmentPage
+							}
+						};
+
+						SelectedPage = changeAmuletPage;
+					}
+				},
+				new Option("Change Shield")
+				{
+					selected = () =>
+					{
+						if (selectedMember?.GetComponent<InventoryComponent>() is not { } inventoryComponent)
+							return;
+
+						var shields = new List<ItemInstance?>();
+
+						foreach (var item in inventoryComponent.Items)
+							if (item.Framework.EquipmentSlot == EquipmentSlot.Shield)
+								shields.Add(item);
+
+						shields = shields.OrderBy(w => w?.Name).ToList();
+						shields.Insert(0, null);
+
+						var selectedIndex = 0;
+						if (selectedMember?.GetComponent<EquipmentComponent>() is { } equipmentComponent)
+							selectedIndex = shields.IndexOf(equipmentComponent.Shield);
+
+						if (selectedIndex < 0)
+							selectedIndex = 0;
+
+						selectedItem = shields[selectedIndex];
+
+						changeShieldPage.Options = new[]
+						{
+							new Option("Shield", shields.Select(w => w?.Name ?? "None").ToArray())
+							{
+								valueChanged = index => selectedItem = shields[index],
+								selected = () =>
+								{
+									var eqComponent = selectedMember?.GetComponent<EquipmentComponent>();
+
+									if (eqComponent?.Shield != null)
+										eqComponent.Unequip(eqComponent.Shield);
+
+									if (selectedItem is not null)
+										eqComponent?.Equip(selectedItem);
+								},
+								SelectedValue = selectedIndex
+							},
+							new Option("Back")
+							{
+								selected = () => SelectedPage = equipmentPage
+							}
+						};
+
+						SelectedPage = changeAmuletPage;
+					}
+				},
+				new Option("Back")
+				{
+					selected = () => { SelectedPage = inventoryPage; }
+				}
+			};
+
+			selectedPage = inventoryPage;
+			Options = selectedPage.Options;
+		}
+
+		private Page SelectedPage
+		{
+			get => selectedPage;
+			set
+			{
+				selectedPage = value;
+				Options = selectedPage.Options;
+			}
+		}
+
+		public event EventHandler? OnContinueSelected;
+
+		public override void RenderTitle()
+		{
+			Screen.ForegroundColor = StandardColor.DarkGreen;
+			Screen.Write("# ========= ");
+			Screen.ForegroundColor = StandardColor.Blue;
+			Screen.Write(SelectedPage.Title);
+			Screen.ForegroundColor = StandardColor.DarkGreen;
+			Screen.WriteLine(" ========= #");
+			Screen.ResetColor();
+
+			if (selectedMember is not null)
+				selectedPage.Render?.Invoke(selectedMember);
+
+			Screen.WriteLine();
+		}
+
+		private void RenderEquipmentChange(Entity entity, EquipmentSlot equipmentSlot)
+		{
+			if (entity.GetComponent<EquipmentComponent>() is not { } equipmentComponent)
+				return;
+
+			var prevFGColor = Screen.ForegroundColor;
+			switch (equipmentSlot)
+			{
+				default:
+					return;
+				case EquipmentSlot.Weapon:
+					var currentWeapon = equipmentComponent.Weapon;
+					var newWeapon = selectedItem as WeaponInstance;
+
+					if (currentWeapon == newWeapon)
+					{
+						var prevColor = Screen.ForegroundColor;
+						Screen.ForegroundColor = StandardColor.Green;
+						Screen.WriteLine("(Equipped)");
+						Screen.ForegroundColor = prevColor;
+					}
+
+					var currentAttribute = currentWeapon?.AttackAttribute.ToString() ?? "None";
+					var newAttribute = (newWeapon?.AttackAttribute ?? Player.DefaultAttribute).ToString();
+					Screen.WriteLine($"Attribute: {currentAttribute} -> {newAttribute}");
+
+					var currentHands = currentWeapon?.TwoHanded ?? false ? "2H" : "1H";
+					var newHands = newWeapon?.TwoHanded ?? false ? "2H" : "1H";
+					Screen.WriteLine($"Hands: {currentHands} -> {newHands}");
+
+					var currentDamageType = currentWeapon?.DamageType ?? Player.DefaultDamageType;
+					var newDamageType = newWeapon?.DamageType ?? Player.DefaultDamageType;
+					Screen.WriteLine($"Damage Type: {currentDamageType.DisplayName} -> {newDamageType.DisplayName}");
+
+					var currentDamageRoll = currentWeapon?.DamageRoll ?? Player.DefaultDamageRoll;
+					var newDamageRoll = newWeapon?.DamageRoll ?? Player.DefaultDamageRoll;
+					Screen.WriteLine($"Damage Roll: {currentDamageRoll} -> {newDamageRoll}");
+
+					var currentHitBonus = currentWeapon?.HitBonus ?? 0;
+					var newHitBonus = newWeapon?.HitBonus ?? 0;
+					Screen.Write($"Hit Bonus: {(currentHitBonus > 0 ? $"+{currentHitBonus}" : currentHitBonus)} -> ");
+
+					Screen.ForegroundColor = newHitBonus > currentHitBonus
+						? StandardColor.DarkGreen
+						: newHitBonus < currentHitBonus
+							? StandardColor.DarkRed
+							: prevFGColor;
+
+					Screen.WriteLine($"{(newHitBonus > 0 ? $"+{newHitBonus}" : newHitBonus)}");
+					Screen.ForegroundColor = prevFGColor;
+					break;
+				case EquipmentSlot.Armor:
+					var currentArmor = equipmentComponent.Armor;
+					var newArmor = selectedItem as ArmorInstance;
+
+					if (currentArmor == newArmor)
+					{
+						var prevColor = Screen.ForegroundColor;
+						Screen.ForegroundColor = StandardColor.Green;
+						Screen.WriteLine("(Equipped)");
+						Screen.ForegroundColor = prevColor;
+					}
+
+					// Defense
+					var currentArmorDefense = currentArmor?.GetArmor(DamageCategory.Physical) ?? 0;
+					var newArmorDefense = newArmor?.GetArmor(DamageCategory.Physical) ?? 0;
+					Screen.Write(
+						$"Defense: {(currentArmorDefense > 0 ? $"+{currentArmorDefense}" : currentArmorDefense)} -> ");
+
+					Screen.ForegroundColor = newArmorDefense > currentArmorDefense
+						? StandardColor.DarkGreen
+						: newArmorDefense < currentArmorDefense
+							? StandardColor.DarkRed
+							: prevFGColor;
+
+					Screen.WriteLine($"{(newArmorDefense > 0 ? $"+{newArmorDefense}" : newArmorDefense)}");
+					Screen.ForegroundColor = prevFGColor;
+
+					// Resistance
+					var currentArmorResistance = currentArmor?.GetArmor(DamageCategory.Magical) ?? 0;
+					var newArmorResistance = newArmor?.GetArmor(DamageCategory.Magical) ?? 0;
+					Screen.Write(
+						$"Resistance: {(currentArmorResistance > 0 ? $"+{currentArmorResistance}" : currentArmorResistance)} -> ");
+
+					Screen.ForegroundColor = newArmorResistance > currentArmorResistance
+						? StandardColor.DarkGreen
+						: newArmorResistance < currentArmorResistance
+							? StandardColor.DarkRed
+							: prevFGColor;
+
+					Screen.WriteLine($"{(newArmorResistance > 0 ? $"+{newArmorResistance}" : newArmorResistance)}");
+					Screen.ForegroundColor = prevFGColor;
+
+					// Stealth Advantage
+					var currentArmorStealthAdvantage = currentArmor?.StealthAdvantage ?? 0;
+					var newArmorStealthAdvantage = newArmor?.StealthAdvantage ?? 0;
+					Screen.Write(
+						$"Stealth Advantage: {(currentArmorStealthAdvantage > 0 ? $"+{currentArmorStealthAdvantage}" : currentArmorStealthAdvantage)} -> ");
+
+					Screen.ForegroundColor = newArmorStealthAdvantage > currentArmorStealthAdvantage
+						? StandardColor.DarkGreen
+						: newArmorStealthAdvantage < currentArmorStealthAdvantage
+							? StandardColor.DarkRed
+							: prevFGColor;
+
+					Screen.WriteLine(
+						$"{(newArmorStealthAdvantage > 0 ? $"+{newArmorStealthAdvantage}" : newArmorStealthAdvantage)}");
+					Screen.ForegroundColor = prevFGColor;
+
+					// Initiative
+					var currentArmorInitiative = currentArmor?.InitiativeBonus ?? 0;
+					var newArmorInitiative = newArmor?.InitiativeBonus ?? 0;
+					Screen.Write(
+						$"Initiative: {(currentArmorInitiative > 0 ? $"+{currentArmorInitiative}" : currentArmorInitiative)} -> ");
+
+					Screen.ForegroundColor = newArmorInitiative > currentArmorInitiative
+						? StandardColor.DarkGreen
+						: newArmorInitiative < currentArmorInitiative
+							? StandardColor.DarkRed
+							: prevFGColor;
+
+					Screen.WriteLine(
+						$"{(newArmorInitiative > 0 ? $"+{newArmorInitiative}" : newArmorInitiative)}");
+					Screen.ForegroundColor = prevFGColor;
+					break;
+				case EquipmentSlot.Shield:
+					var currentShield = equipmentComponent.Shield;
+					var newShield = selectedItem as ShieldInstance;
+
+					if (currentShield == newShield)
+					{
+						var prevColor = Screen.ForegroundColor;
+						Screen.ForegroundColor = StandardColor.Green;
+						Screen.WriteLine("(Equipped)");
+						Screen.ForegroundColor = prevColor;
+					}
+
+					// Defense
+					var currentShieldDefense = currentShield?.Defense ?? 0;
+					var newShieldDefense = newShield?.Defense ?? 0;
+					Screen.Write(
+						$"Defense: {(currentShieldDefense > 0 ? $"+{currentShieldDefense}" : currentShieldDefense)} -> ");
+
+					Screen.ForegroundColor = newShieldDefense > currentShieldDefense
+						? StandardColor.DarkGreen
+						: newShieldDefense < currentShieldDefense
+							? StandardColor.DarkRed
+							: prevFGColor;
+
+					Screen.WriteLine($"{(newShieldDefense > 0 ? $"+{newShieldDefense}" : newShieldDefense)}");
+					Screen.ForegroundColor = prevFGColor;
+
+					// Initiative
+					var currentShieldInitiative = currentShield?.InitiativeBonus ?? 0;
+					var newShieldInitiative = newShield?.InitiativeBonus ?? 0;
+					Screen.Write(
+						$"Initiative: {(currentShieldInitiative > 0 ? $"+{currentShieldInitiative}" : currentShieldInitiative)} -> ");
+
+					Screen.ForegroundColor = newShieldInitiative > currentShieldInitiative
+						? StandardColor.DarkGreen
+						: newShieldInitiative < currentShieldInitiative
+							? StandardColor.DarkRed
+							: prevFGColor;
+
+					Screen.WriteLine(
+						$"{(newShieldInitiative > 0 ? $"+{newShieldInitiative}" : newShieldInitiative)}");
+					Screen.ForegroundColor = prevFGColor;
+					break;
+			}
+		}
+
+		private sealed class Page
+		{
+			public Page(string title)
+			{
+				Title = title;
+			}
+
+			public string Title { get; }
+			public Option[] Options { get; set; } = Array.Empty<Option>();
+			public Action<Entity>? Render { get; init; }
 		}
 	}
 
