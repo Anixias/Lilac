@@ -17,6 +17,7 @@ public abstract class MenuContainer : IMenu
 {
 	protected readonly Dictionary<ConsoleKeyInfo, Action> customKeyEvents = new();
 	private IMenu? currentMenu;
+
 	protected IMenu? CurrentMenu
 	{
 		get => currentMenu;
@@ -50,10 +51,15 @@ public abstract class MenuContainer : IMenu
 		return currentMenu?.HandleKey(key) ?? false;
 	}
 
-	protected abstract void RenderContainerTitle();
+	public virtual void Activated()
+	{
+	}
 
-	public virtual void Activated() {}
-	public virtual void Deactivated() {}
+	public virtual void Deactivated()
+	{
+	}
+
+	protected abstract void RenderContainerTitle();
 }
 
 public abstract class Prompt : IMenu
@@ -82,7 +88,8 @@ public abstract class Prompt : IMenu
 				Input = "";
 				break;
 			case ConsoleKey.Backspace:
-				if (Input.Length > 0) Input = Input.Remove(Input.Length - 1);
+				if (Input.Length > 0)
+					Input = Input.Remove(Input.Length - 1);
 				break;
 			default:
 				Input += key.KeyChar;
@@ -92,15 +99,20 @@ public abstract class Prompt : IMenu
 		return true;
 	}
 
+	public virtual void Activated()
+	{
+	}
+
+	public virtual void Deactivated()
+	{
+	}
+
 	public event InputEventHandler? OnInputSubmitted;
 
 	public void SetInput(string input)
 	{
 		Input = input;
 	}
-
-	public virtual void Activated() {}
-	public virtual void Deactivated() {}
 }
 
 public interface ISelectionMenu : IMenu
@@ -179,6 +191,8 @@ public abstract class Menu : ISelectionMenu
 	{
 		hoverIndex = 0;
 	}
-	
-	public virtual void Deactivated() {}
+
+	public virtual void Deactivated()
+	{
+	}
 }
